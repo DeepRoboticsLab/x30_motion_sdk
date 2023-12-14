@@ -58,16 +58,16 @@ int main(int argc, char* argv[]){
 
 /*******A simple demo that stands up (for testing and can be deleted by yourself)*********/
     time_tick++;
-    if(time_tick < 1000){
+    if(time_tick < 5000){
       robot_set_up_demo.PreStandUp(robot_joint_cmd, now_time, *robot_data);///< Stand up and prepare for action
     } 
-    if(time_tick == 1000){
+    if(time_tick == 5000){
       robot_set_up_demo.GetInitData(robot_data->joint_state, now_time);///< Obtain all joint states once before each stage (action)
     }
-    if(time_tick >= 1000 ){
+    if(time_tick >= 5000 ){
       robot_set_up_demo.StandUp(robot_joint_cmd, now_time, *robot_data);///< Full stand up
     }
-    if(time_tick >= 100000){
+    if(time_tick >= 500000){
       send2robot_cmd->control_get(1);                                 ///< Return the control right, input: 1. Original algorithm control of the robot 2. SDK control PS: over 5ms, no data set sent_ Send (cmd), you will lose control, you need to resend to obtain control
     }
 
@@ -76,7 +76,8 @@ int main(int argc, char* argv[]){
     send2robot_cmd->set_send(robot_joint_cmd);               
     // send2robot_cmd->set_send(robot_joint_cmd);
     loopcount++;
-  //  cout << robot_joint_cmd.joint_cmd[0].pos<<" "<<robot_joint_cmd.joint_cmd[1].pos<<"  "<<robot_joint_cmd.joint_cmd[2].pos<<"  "<<robot_data->joint_state.fl_leg[0].pos<<"  "<<robot_data->joint_state.fl_leg[1].pos<<"  "<<robot_data->joint_state.fl_leg[2].pos<<" "<< robot_joint_cmd.joint_cmd[3].pos<<" "<<robot_joint_cmd.joint_cmd[4].pos<<"  "<<robot_joint_cmd.joint_cmd[5].pos<<" "<< robot_joint_cmd.joint_cmd[6].pos<<" "<<robot_joint_cmd.joint_cmd[7].pos<<"  "<<robot_joint_cmd.joint_cmd[8].pos<<" "<< robot_joint_cmd.joint_cmd[9].pos<<" "<<robot_joint_cmd.joint_cmd[10].pos<<"  "<<robot_joint_cmd.joint_cmd[11].pos<<" "<<robot_data->imu.acc_x<<"  "<<loopcount << endl;
+    cout<<robot_data->joint_state.joint_data[4].tor<<" | "<<robot_joint_cmd.joint_cmd[1].tor <<" | "<<robot_joint_cmd.fl_leg[1].tor <<endl;
+   // cout << robot_joint_cmd.joint_cmd[0].pos<<" "<<robot_joint_cmd.joint_cmd[1].pos<<"  "<<robot_joint_cmd.joint_cmd[2].pos<<"  "<<robot_data->joint_state.fl_leg[0].pos<<"  "<<robot_data->joint_state.fl_leg[1].pos<<"  "<<robot_data->joint_state.fl_leg[2].pos<<" "<< robot_joint_cmd.joint_cmd[3].pos<<" "<<robot_joint_cmd.joint_cmd[4].pos<<"  "<<robot_joint_cmd.joint_cmd[5].pos<<" "<< robot_joint_cmd.joint_cmd[6].pos<<" "<<robot_joint_cmd.joint_cmd[7].pos<<"  "<<robot_joint_cmd.joint_cmd[8].pos<<" "<< robot_joint_cmd.joint_cmd[9].pos<<" "<<robot_joint_cmd.joint_cmd[10].pos<<"  "<<robot_joint_cmd.joint_cmd[11].pos<<" "<<robot_data->imu.acc_x<<"  "<<loopcount << endl;
   }
   return 0;
 } 

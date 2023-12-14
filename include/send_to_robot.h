@@ -27,7 +27,7 @@
 #include "udp_socket.hpp"
 #include "robot_types.h"
 
-#define DEFAULT_ROBOT_IP "192.168.1.120"
+#define DEFAULT_ROBOT_IP "192.168.1.103"
 #define DEFAULT_ROBOT_PORT 43893
 
 #define ABLE 2

@@ -142,12 +142,14 @@ void MotionExample::SwingToAngle(double initial_angle[3], double final_angle[3],
 
   // Joint pd control - position control method, namely, issuing kp, kd, goal_ angle，goal_ Vel, feedforward force tor=0, joint end completes joint pd control closed-loop
   if(true){
-    cmd.joint_cmd[3 * leg_side].kp = 60;
-    cmd.joint_cmd[3 * leg_side + 1].kp = 60;
-    cmd.joint_cmd[3 * leg_side + 2].kp = 60;
-    cmd.joint_cmd[3 * leg_side].kd = 0.7;
-    cmd.joint_cmd[3 * leg_side + 1].kd = 0.7;
-    cmd.joint_cmd[3 * leg_side + 2].kd = 0.7;
+    double  kp=150;
+    double  kd=1;
+    cmd.joint_cmd[3 * leg_side].kp = kp;
+    cmd.joint_cmd[3 * leg_side + 1].kp = kp;
+    cmd.joint_cmd[3 * leg_side + 2].kp = kp;
+    cmd.joint_cmd[3 * leg_side].kd = kd;
+    cmd.joint_cmd[3 * leg_side + 1].kd = kd;
+    cmd.joint_cmd[3 * leg_side + 2].kd = kd;
     cmd.joint_cmd[3 * leg_side].pos = goal_angle[0];
     cmd.joint_cmd[3 * leg_side + 1].pos = goal_angle[1];
     cmd.joint_cmd[3 * leg_side + 2].pos = goal_angle[2];
