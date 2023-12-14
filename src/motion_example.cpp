@@ -13,6 +13,15 @@
 double init_angle_fl[3], init_angle_fr[3], init_angle_hl[3], init_angle_hr[3];
 double init_time;
 
+double  kp_hipx=200;
+double  kd_hipx=2;
+
+double  kp_hipy=200;
+double  kd_hipy=2;
+
+double  kp_knee=200;
+double  kd_knee=2;
+
 /**
  * @brief Spend 1 s putting the robot's legs away and preparing to stand
  * @param cmd Issue control command
@@ -142,14 +151,13 @@ void MotionExample::SwingToAngle(double initial_angle[3], double final_angle[3],
 
   // Joint pd control - position control method, namely, issuing kp, kd, goal_ angle，goal_ Vel, feedforward force tor=0, joint end completes joint pd control closed-loop
   if(true){
-    double  kp=150;
-    double  kd=1;
-    cmd.joint_cmd[3 * leg_side].kp = kp;
-    cmd.joint_cmd[3 * leg_side + 1].kp = kp;
-    cmd.joint_cmd[3 * leg_side + 2].kp = kp;
-    cmd.joint_cmd[3 * leg_side].kd = kd;
-    cmd.joint_cmd[3 * leg_side + 1].kd = kd;
-    cmd.joint_cmd[3 * leg_side + 2].kd = kd;
+    
+    cmd.joint_cmd[3 * leg_side].kp = kp_hipx;
+    cmd.joint_cmd[3 * leg_side + 1].kp = kp_hipy;
+    cmd.joint_cmd[3 * leg_side + 2].kp = kp_knee;
+    cmd.joint_cmd[3 * leg_side].kd = kd_hipx;
+    cmd.joint_cmd[3 * leg_side + 1].kd = kd_hipy;
+    cmd.joint_cmd[3 * leg_side + 2].kd = kd_knee;
     cmd.joint_cmd[3 * leg_side].pos = goal_angle[0];
     cmd.joint_cmd[3 * leg_side + 1].pos = goal_angle[1];
     cmd.joint_cmd[3 * leg_side + 2].pos = goal_angle[2];
