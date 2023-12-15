@@ -13,14 +13,14 @@
 double init_angle_fl[3], init_angle_fr[3], init_angle_hl[3], init_angle_hr[3];
 double init_time;
 
-double  kp_hipx=200;
-double  kd_hipx=2;
+double  kp_hipx=300;
+double  kd_hipx=4;
 
-double  kp_hipy=200;
-double  kd_hipy=2;
+double  kp_hipy=300;
+double  kd_hipy=4;
 
-double  kp_knee=200;
-double  kd_knee=2;
+double  kp_knee=300;
+double  kd_knee=4;
 
 /**
  * @brief Spend 1 s putting the robot's legs away and preparing to stand
@@ -66,8 +66,8 @@ void MotionExample::StandUp(RobotCmdSDK &cmd, double time,RobotDataSDK &data_sta
   }else{
     for (int i = 0; i < 12; i++) {
       cmd.joint_cmd[i].tor = 0;
-      cmd.joint_cmd[i].kp = 80;
-      cmd.joint_cmd[i].kd = 0.7;
+      cmd.joint_cmd[i].kp = 300.0;
+      cmd.joint_cmd[i].kd = 4.0;
     }
     for (int i = 0; i < 4; i++) {
       cmd.joint_cmd[3*i].pos = 0;

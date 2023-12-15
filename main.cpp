@@ -67,7 +67,7 @@ int main(int argc, char* argv[]){
     if(time_tick >= 5000 ){
       robot_set_up_demo.StandUp(robot_joint_cmd, now_time, *robot_data);///< Full stand up
     }
-    if(time_tick >= 500000){
+    if(time_tick >= 10000){
       send2robot_cmd->control_get(1);                                 ///< Return the control right, input: 1. Original algorithm control of the robot 2. SDK control PS: over 5ms, no data set sent_ Send (cmd), you will lose control, you need to resend to obtain control
     }
 
