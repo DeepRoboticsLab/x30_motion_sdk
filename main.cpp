@@ -74,8 +74,7 @@ int main(int argc, char* argv[]){
 
 
 /*********A simple demo that stands up (for testing and can be deleted by yourself)*******/
-    // send2robot_cmd->set_send(robot_joint_cmd);               
-    // send2robot_cmd->set_send(robot_joint_cmd);
+  //   send2robot_cmd->set_send(robot_joint_cmd);               
     loopcount++;
     cout<<robot_data->joint_state.joint_data[2].tor<<" | "<<robot_joint_cmd.joint_cmd[2].tor <<" | "<<robot_joint_cmd.fl_leg[2].tor <<endl;
    // cout << robot_joint_cmd.joint_cmd[0].pos<<" "<<robot_joint_cmd.joint_cmd[1].pos<<"  "<<robot_joint_cmd.joint_cmd[2].pos<<"  "<<robot_data->joint_state.fl_leg[0].pos<<"  "<<robot_data->joint_state.fl_leg[1].pos<<"  "<<robot_data->joint_state.fl_leg[2].pos<<" "<< robot_joint_cmd.joint_cmd[3].pos<<" "<<robot_joint_cmd.joint_cmd[4].pos<<"  "<<robot_joint_cmd.joint_cmd[5].pos<<" "<< robot_joint_cmd.joint_cmd[6].pos<<" "<<robot_joint_cmd.joint_cmd[7].pos<<"  "<<robot_joint_cmd.joint_cmd[8].pos<<" "<< robot_joint_cmd.joint_cmd[9].pos<<" "<<robot_joint_cmd.joint_cmd[10].pos<<"  "<<robot_joint_cmd.joint_cmd[11].pos<<" "<<robot_data->imu.acc_x<<"  "<<loopcount << endl;
