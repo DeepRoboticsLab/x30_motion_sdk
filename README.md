@@ -292,7 +292,9 @@ $$
 **答：**
 
 当SDK有指令下发时，底层控制器会优先执行SDK的控制指令，并把指令分发给机器狗12个关节。当SDK没有指令下发时，经过1s的超时判断后，底层控制器会拿回控制权，进入阻尼保护模式一段时间后，清空关节指令。控制流程图可以参考下图：
-![](https://github.com/DeepRoboticsLab/Lite3_MotionSDK/blob/main/MotionControlFlow.png?raw=true)
+<img src="./doc/MotionControlFlow.png" alt="a" style="zoom:100%;" />
+
+
 
 
 ### 问题六 
@@ -310,7 +312,7 @@ $$
 ```toml
 torque_limit=[42.0,42.0,90.0]   
 ```
-该数组的第1，2，3个数分别代表髋关节(hipx)，侧摆关节(hipy)，膝关节(knee)的力矩限幅，你可按需修改。
+该数组的第1，2，3个数分别代表髋关节(hipx)，侧摆关节(hipy)，膝关节(knee)的力矩限幅，你可按需修改，建议在刚开始测试程序的时候将力矩限幅设置的较小一些，待程序验证无误后再放开力矩限幅，确保机器人处于安全的状态。
 
 **修改后，执行如下指令重启运动程序，使得修改生效**，
 ```bash
@@ -318,6 +320,8 @@ cd /home/ysc/jy_exe
 sudo ./stop.sh
 sudo ./restart.sh
 ```
+
+
 
 ### 其他注意事项
 
@@ -375,4 +379,4 @@ sudo ./restart.sh
 
 
 
-【注意】其他有关于机器人的动力学参数可以在提供的URDF文件中获得
+【注意】其他有关于X30四足机器人的动力学参数可以在提供的URDF文件中获得
