@@ -20,7 +20,8 @@
 	ip = '192.168.1.103'
 	target_port = 43897
 	local_port = 43893
-	~
+	ips = ["192.168.1.105","192.168.1.106"]
+	ports = [43897,43897]
 	```
 	
 - 修改配置文件第一行中的IP地址，使得 **MotionSDK** 能够接收到机器狗数据:
@@ -49,21 +50,11 @@
 
 - 打开 ***build*** 文件夹并编译；
 
-   - 如果主机是x86架构，在终端中输入：
-
-		```bash
-		cd build
-		cmake .. -DBUILD_PLATFORM=x86     # cmake <path to where the CMakeLists.txt is>
-		make -j
-		```
-		
-	- 如果主机是ARM架构，在终端中输入：
-
-		```bash
-		cd build
-		cmake .. -DBUILD_PLATFORM=arm     # cmake <path to where the CMakeLists.txt is>
-		make -j
-		```
+   ```bash
+	cd build
+	cmake .. 
+	make -j
+	```
 	
 - 编译结束后，会在 ***build*** 目录下生成一个名为 ***X30_motion*** 的可执行文件，此即为我们代码编译出来的结果；
 
@@ -75,7 +66,7 @@
 **在X30_MotionSDK的main.cpp中，倒数几行有一行被注释的指令下发代码**：
 
 ```c++
-//send_cmd->SendCmd(robot_joint_cmd); 
+//send2robot_cmd->set_send(robot_joint_cmd);
 ```
 
 **此为SDK下发指令的调用，为了确保SDK的安全使用，这行下发指令默认是注释掉的，机器狗默认只会回零不会起立。**
@@ -88,79 +79,79 @@
 定时器，用于设置算法周期，获得当前时间：
 
 ```cpp
-DRTimer set_timer;
-set_timer.TimeInit(int);                              		  ///< Timer initialization, input: cycle; unit: ms
-set_timer.GetCurrentTime();                           		  ///< Obtain time for algorithm
-set_timer.TimerInterrupt()			      		  ///< Timer interrupt flag
-set_timer.GetIntervalTime(double);                    		  ///< Get the current time
+TimeTool my_set_timer;
+my_set_timer.time_init(int);                              		  ///< Timer initialization, input: cycle; unit: ms
+my_set_timer.get_start_time();                           		  ///< Obtain time for algorithm
+my_set_timer.time_interrupt()			      		              ///< Timer interrupt flag
+my_set_timer.get_now_time(double);               		          ///< Get the current time
 ```
 
 SDK在绑定机器人的IP和端口后，获取控制权， 发送关节控制指令：
 
 ```cpp
-Sender* send_cmd = new Sender("192.168.1.103",43893); 		  ///< Create a sender thread
-send_cmd->RobotStateInit();                           		  ///< Reset all joints to zero and gain control right
-send_cmd->SetSend(RobotCmd); 			     		  ///< Send joint control command
-send_cmd->ControlGet(int);                            		  ///< Return the control right
+SendToRobot* send2robot_cmd = new SendToRobot("192.168.1.103",43893);   ///< Create a sender thread
+send2robot_cmd->robot_state_init();                           		    ///< Reset all joints to zero and gain control right
+send2robot_cmd->set_send(RobotCmdSDK); 			     		            ///< Send joint control command
+send2robot_cmd->control_get(int);                            		    ///< Return the control right
 ```
 
 SDK接收机器人下发的关节数据：
 
 ```cpp
-Receiver* robot_data_recv = new Receiver();           		  ///< Create a thread for receiving and parsing
-robot_data_recv->GetState(); 			      		  ///< Receive data from 12 joints
-robot_data_recv->RegisterCallBack(CallBack);			    ///< Registering Callbacks
+ParseCommand* robot_data_rec = new ParseCommand;           		  ///< Create a thread for receiving and parsing
+robot_data_rec->getRecvState(); 			      		          ///< Receive data from 12 joints
+
 ```
 
 SDK接收到的关节数据将保存在`robot_data`中：
 
 ```cpp
-RobotData *robot_data = &robot_data_recv->GetState(); 		  ///< Saving joint data to the robot_data
-///< Left front leg：fl_leg[3], the sequence is FL_HipX, FL_HipY, FL_Knee
-///< Right front leg：fr_leg[3], the sequence is FR_HipX, FR_HipY, FR_Knee
-///< Left hind leg：hl_leg[3], the sequence is HL_HipX, HL_HipY, HL_Knee
-///< Right hind leg：hr_leg[3], the sequence is HR_HipX, HR_HipY, HR_Knee
-///< All joints：leg_force[12]/joint_data[12], the sequence is FL_HipX, FL_HipY, FL_Knee, FR_HipX, FR_HipY, FR_Knee, HL_HipX, HL_HipY, HL_Knee, HR_HipX, HR_HipY, HR_Knee
+RobotDataSDK *robot_data = &robot_data_rec->getRecvState(); 		  ///< Saving joint data to the robot_data
+///< Left front leg：fl_leg[3], the sequence is fl_hipx, fl_Hipy, fl_knee
+///< Right front leg：fr_leg[3], the sequence is fr_hipx, fr_Hipy, fr_knee
+///< Left hind leg：hl_leg[3], the sequence is hl_hipx, hl_Hipy, hl_knee
+///< Right hind leg：hr_leg[3], the sequence is hr_hipx, hr_Hipy, hr_knee
+///< All joints：leg_force[12]/joint_data[12], the sequence is fl_hipx, fl_hipy, fl_knee, fr_hipx, fr_Hipy, fr_knee, hl_hipx, hl_hipy, hl_knee, hr_hipx, hr_hipy, hr_knee
 	
-robot_data->contact_force.fl_leg[]				  ///< Contact force on left front foot in X-axis, Y-axis and Z-axis
-robot_data->contact_force.fr_leg[]				  ///< Contact force on right front foot in X-axis, Y-axis and Z-axis
-robot_data->contact_force.hl_leg[]				  ///< Contact force on left hind foot in X-axis, Y-axis and Z-axis
-robot_data->contact_force.hr_leg[]				  ///< Contact force on right hind foot in X-axis, Y-axis and Z-axis
-robot_data->contact_force.leg_force[]			          ///< Contact force on all feet
+robot_data->fl_force[]				  ///< Contact force on left front foot in X-axis, Y-axis and Z-axis
+robot_data->fr_force[]				  ///< Contact force on right front foot in X-axis, Y-axis and Z-axis
+robot_data->hl_force[]				  ///< Contact force on left hind foot in X-axis, Y-axis and Z-axis
+robot_data->hr_force[]				  ///< Contact force on right hind foot in X-axis, Y-axis and Z-axis
+robot_data->contact_force[]			  ///< Contact force on all feet
 	
 robot_data->tick						  ///< Cycle of operation
 	
-robot_data->imu							  ///< IMU data	
-robot_data->imu.acc_x						  ///< Acceleration on X-axis
-robot_data->imu.acc_y						  ///< Acceleration on Y-axis
-robot_data->imu.acc_z						  ///< Acceleration on Z-axis
-robot_data->imu.angle_pitch					  ///< Pitch angle
-robot_data->imu.angle_roll					  ///< Roll angle
-robot_data->imu.angle_yaw					  ///< Yaw angle
-robot_data->imu.angular_velocity_pitch			  	  ///< Pitch angular velocity
-robot_data->imu.angular_velocity_roll			  	  ///< Roll angular velocity
-robot_data->imu.angular_velocity_yaw		   	 	  ///< Yaw angular velocity
+robot_data->imu							      ///< IMU data	
+robot_data->imu.acc_x						  ///< Acceleration on X-axis, unit m/s^2
+robot_data->imu.acc_y						  ///< Acceleration on Y-axis, unit m/s^2
+robot_data->imu.acc_z						  ///< Acceleration on Z-axis, unit m/s^2
+robot_data->imu.roll					      ///< Roll angle, unit deg
+robot_data->imu.pitch					      ///< Pitch angle, unit deg
+robot_data->imu.yaw					          ///< Yaw angle, unit deg
+robot_data->imu.omega_x			  	          ///< angular velocity on X-axis, unit rad/s
+robot_data->imu.omega_y			  	          ///< angular velocity on Y-axis, unit rad/s
+robot_data->imu.omega_z		   	 	          ///< angular velocity on Z-axis, unit rad/s
 robot_data->imu.buffer_byte					  ///< Buffer data
-robot_data->imu.buffer_float					  ///< Buffer data
+robot_data->imu.buffer_float			      ///< Buffer data
 robot_data->imu.timestamp					  ///< Time when the data is obtained
 
-robot_data->joint_data						  ///< Motor status
-robot_data->joint_data.fl_leg[].position		  	  ///< Motor position of left front leg
-robot_data->joint_data.fl_leg[].temperature	  		  ///< Motor temperature of left front leg
-robot_data->joint_data.fl_leg[].torque		 	  ///< Motor torque of left front leg 
-robot_data->joint_data.fl_leg[].velocity		 	  ///< Motor velocity of left front leg
-robot_data->joint_data.joint_data              		  ///< All joint data
+robot_data->joint_state						  ///< Motor status
+robot_data->joint_state.fl_leg[].position	  ///< Motor position of left front leg
+robot_data->joint_state.fl_leg[].temperature  ///< Motor temperature of left front leg
+robot_data->joint_state.fl_leg[].torque		  ///< Motor torque of left front leg 
+robot_data->joint_state.fl_leg[].velocity	  ///< Motor velocity of left front leg
+robot_data->joint_state.joint_data            ///< All joint data
 ```
 
 机器人关节控制指令：
 
 ```cpp
-RobotCmd robot_joint_cmd;  					  ///< Target data of each joint
-///< Left front leg：fl_leg[3], the sequence is FL_HipX, FL_HipY, FL_Knee
-///< Right front leg：fr_leg[3], the sequence is FR_HipX, FR_HipY, FR_Knee
-///< Left hind leg：hl_leg[3], the sequence is HL_HipX, HL_HipY, HL_Knee
-///< Right hind leg：hr_leg[3], the sequence is HR_HipX, HR_HipY, HR_Knee
-///< All joints：leg_force[12]/joint_data[12], the sequence is FL_HipX, FL_HipY, FL_Knee, FR_HipX, FR_HipY, FR_Knee, HL_HipX, HL_HipY, HL_Knee, HR_HipX, HR_HipY, HR_Knee
+RobotCmdSDK robot_joint_cmd;  					  ///< Target data of each joint
+///< Left front leg：fl_leg[3], the sequence is fl_hipx, fl_Hipy, fl_knee
+///< Right front leg：fr_leg[3], the sequence is fr_hipx, fr_Hipy, fr_knee
+///< Left hind leg：hl_leg[3], the sequence is hl_hipx, hl_Hipy, hl_knee
+///< Right hind leg：hr_leg[3], the sequence is hr_hipx, hr_Hipy, hr_knee
+///< All joints：leg_force[12]/joint_data[12], the sequence is fl_hipx, fl_hipy, fl_knee, fr_hipx, fr_Hipy, fr_knee, hl_hipx, hl_hipy, hl_knee, hr_hipx, hr_hipy, hr_knee
 
 robot_joint_cmd.fl_leg[]->kd;					  ///< Kd of left front leg
 robot_joint_cmd.fl_leg[]->kp;					  ///< Kp of left front leg
@@ -261,25 +252,37 @@ SDK采用UDP与机器狗进行通讯。
 **答：**
 
 提供goal_pos,goal_vel,kp,kd,t_ff，共5个关节控制参数接口，控制接口全为低速端，也就是**关节端**，最终关节目标力为
-$$T=kp*(pos_{goal} - pos_{real})+kd*(vel_{goal} - vel_{real})+t_{ff}$$
-
+$$
+T=kp*(pos_{goal} - pos_{real})+kd*(vel_{goal} - vel_{real})+t_{ff}
+$$
 驱动器端会将最终的关节目标力转化成期望电流，并以20kHz的频率进行闭环控制。
 
 **使用举例：**
 
 当做纯位控即位置控制时，电机的输出轴将会稳定在一个固定的位置。例如，如果我们希望电机输出端固定在3.14弧度的位置，下发数据格式示例：
-$$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=0, t_{ff} = 0$$
+$$
+pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=0, t_{ff} = 0
+$$
 当做速度控制时，下发数据格式示例：
-$$pos_{goal}=0, vel_{goal}=5, kp=0, kd=1, t_{ff} = 0$$
+$$
+pos_{goal}=0, vel_{goal}=5, kp=0, kd=1, t_{ff} = 0
+$$
 当做阻尼控制时，下发数据格式示例：
-$$pos_{goal}=0, vel_{goal}=0, kp=0, kd=1, t_{ff} = 0$$
+$$
+pos_{goal}=0, vel_{goal}=0, kp=0, kd=1, t_{ff} = 0
+$$
 当做力矩控制时，下发数据格式示例：
-$$pos_{goal}=0, vel_{goal}=0, kp=0, kd=0, t_{ff} = 3$$
+$$
+pos_{goal}=0, vel_{goal}=0, kp=0, kd=0, t_{ff} = 3
+$$
 当做零力矩控制时，下发数据格式示例：
-$$pos_{goal}=0, vel_{goal}=0, kp=0, kd=0, t_{ff} = 0$$
+$$
+pos_{goal}=0, vel_{goal}=0, kp=0, kd=0, t_{ff} = 0
+$$
 当做混合控制时，下发数据格式示例：
-$$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
-
+$$
+pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1
+$$
 
 
 ### 问题五
@@ -294,9 +297,8 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 
 ### 其他注意事项
 
-1. X30运动主机是ARM架构的，如果开发者想在运动主机上运行自己的程序，需要注意。
+1. X30运动主机是ARM架构的，如果开发者想在运动主机上编译自己的程序，需要注意。
 2. WiFi通讯受网络环境干扰产生的通讯延迟波动，可能对控制频率在500Hz以上的控制器有一定的影响。
-
 
 
 
