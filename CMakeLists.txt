@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(X30_motion)
+project(x30_motion)
 # SET(CMAKE_C_COMPILER "aarch64-linux-gnu-gcc")
 # SET(CMAKE_CXX_COMPILER "aarch64-linux-gnu-g++") 
 set(CMAKE_BUILD_TYPE Release)

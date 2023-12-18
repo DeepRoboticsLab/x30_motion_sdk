@@ -61,6 +61,8 @@ class ParseCommand{
 
     RobotDataSDK& getRecvState(); /**< Save the obtained data in st.*/
 
+    void printData(); /**< Print the recieved data */
+
     int getDataRevState(){
       return is_data_recv;
     }

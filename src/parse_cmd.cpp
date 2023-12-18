@@ -60,6 +60,27 @@ void ParseCommand::startWork()
   std::thread work_thread(std::bind(&ParseCommand::work, this));
 	work_thread.detach();
 }
+
 RobotDataSDK& ParseCommand::getRecvState(){
   return state_rec;
+}
+
+void ParseCommand::printData(){
+  std::cout.precision(3);
+  std::cout << "time_tick: " << state_rec.tick << std::endl;
+  std::cout << "Imu Data:  " << std::endl;
+  std::cout << "rpy:  " << state_rec.imu.roll << " " << state_rec.imu.pitch << " " << state_rec.imu.yaw << std::endl;
+  std::cout << "gyro: " << state_rec.imu.omega_x << " " << state_rec.imu.omega_y << " " << state_rec.imu.omega_z << std::endl;
+  std::cout << "acc:  " << state_rec.imu.acc_x << " " << state_rec.imu.acc_y << " " << state_rec.imu.acc_z << std::endl;
+
+  std::cout << "Leg Data:  " << std::endl;
+  std::cout << "pos:  ";
+  for(int i=0;i<12;++i) std::cout << state_rec.joint_state.joint_data[i].pos << " ";
+  std::cout << std::endl;
+  std::cout << "vel:  ";
+  for(int i=0;i<12;++i) std::cout << state_rec.joint_state.joint_data[i].vel << " ";
+  std::cout << std::endl;
+  std::cout << "tor:  ";
+  for(int i=0;i<12;++i) std::cout << state_rec.joint_state.joint_data[i].tor << " ";
+  std::cout << std::endl;
 }
