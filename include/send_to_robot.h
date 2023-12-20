@@ -104,7 +104,7 @@ class SendToRobot{
           cmd.joint_cmd[i].kd = 15.0;
         }
         set_send(cmd);
-        sleep(2);
+        sleep(5);
         Command command_temp(0x0113,0, 0);
         cmd_done(command_temp);
       }else if (mode == ABLE){
