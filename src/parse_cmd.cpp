@@ -31,7 +31,10 @@ void ParseCommand::work()
       switch (cm.command.code){
         case STATE_RECEIVE_CODE:
           clock_gettime(1, &test_time);
-          memcpy(&state_rec, cm.data_buffer, sizeof(state_rec));
+          memcpy(&state_rec, cm.data_buffer, sizeof(state_rec));   
+          if(CallBack_){
+            CallBack_(STATE_RECEIVE_CODE);
+          }
           break;
       default:
         break;
