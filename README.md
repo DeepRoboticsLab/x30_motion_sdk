@@ -97,7 +97,7 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 
 - 输入以下命令以打开网络配置文件：
 	```Bash
-	cd /home/ysc/jy_exe/conf/
+	cd ~/jy_exe/conf/
 	vim network.toml
 	```
 - 配置文件 ***network.toml*** 内容如下：
@@ -115,7 +115,7 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 
 - 数据上报地址配置完成后，需要将运动主机向sdk上报数据的开关打开，首先打开配置文件 ***sdk_config.toml*** :
 	```Bash
-	cd /home/ysc/jy_exe/conf/
+	cd ~/jy_exe/conf/
 	vim sdk_config.toml
 	```
 
@@ -139,7 +139,7 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 
 - 重启运动程序使配置生效：
 	```bash
-	cd /home/ysc/jy_exe
+	cd ~/jy_exe
 	sudo ./stop.sh
 	sudo ./restart.sh
 	```
@@ -212,7 +212,7 @@ MotionSDK采用UDP与机器狗进行通讯。
 执行抓包命令后等待2分钟，观察机器狗是否有原始数据上报。如果没有，输入top命令查看机器狗本体控制程序进程jy_exe是否正常运行，若jy_exe没有正常运行，参照以下指令重启运动程序：
 
 ```bash
- cd /home/ysc/jy_exe
+ cd ~/jy_exe
  sudo ./stop.sh
  sudo ./restart.sh
 ```
