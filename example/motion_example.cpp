@@ -84,7 +84,7 @@ void MotionExample::StandUp(RobotCmdSDK &cmd, double time,RobotDataSDK &data_sta
   * @param data Current joint data
   * @param time Current timestamp
   */
-void MotionExample::GetInitData(JointDataSDK data, double time) {
+void MotionExample::GetInitData(RobotDataSDK data, double time) {
   init_time = time;
   // Only the current moment and angle are recorded
   init_angle_fl[0] = data.fl_leg[0].pos;
@@ -182,12 +182,12 @@ void MotionExample::SwingToAngle(double initial_angle[3], double final_angle[3],
     cmd.joint_cmd[3 * leg_side].vel = 0;
     cmd.joint_cmd[3 * leg_side + 1].vel = 0;
     cmd.joint_cmd[3 * leg_side + 2].vel = 0;
-    cmd.joint_cmd[3* leg_side].tor = 60 * (goal_angle[0] - data.joint_state.joint_data[3* leg_side].pos)
-                                    + 0.7 * (goal_vel[0] - data.joint_state.joint_data[3* leg_side].vel);
-    cmd.joint_cmd[3* leg_side+1].tor = 80 * (goal_angle[1] - data.joint_state.joint_data[3* leg_side+1].pos)
-                                    + 0.7 * (goal_vel[1] - data.joint_state.joint_data[3* leg_side+1].vel);
-    cmd.joint_cmd[3* leg_side+2].tor = 80 * (goal_angle[2] - data.joint_state.joint_data[3* leg_side+2].pos)
-                                    + 0.7 * (goal_vel[2] - data.joint_state.joint_data[3* leg_side+2].vel);
+    cmd.joint_cmd[3* leg_side].tor = 60 * (goal_angle[0] - data.joint_data[3* leg_side].pos)
+                                    + 0.7 * (goal_vel[0] - data.joint_data[3* leg_side].vel);
+    cmd.joint_cmd[3* leg_side+1].tor = 80 * (goal_angle[1] - data.joint_data[3* leg_side+1].pos)
+                                    + 0.7 * (goal_vel[1] - data.joint_data[3* leg_side+1].vel);
+    cmd.joint_cmd[3* leg_side+2].tor = 80 * (goal_angle[2] - data.joint_data[3* leg_side+2].pos)
+                                    + 0.7 * (goal_vel[2] - data.joint_data[3* leg_side+2].vel);
   }
 }
 

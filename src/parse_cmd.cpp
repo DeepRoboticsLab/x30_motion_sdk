@@ -78,12 +78,12 @@ void ParseCommand::printData(){
 
   std::cout << "Leg Data:  " << std::endl;
   std::cout << "pos:  ";
-  for(int i=0;i<12;++i) std::cout << state_rec.joint_state.joint_data[i].pos << " ";
+  for(int i=0;i<12;++i) std::cout << state_rec.joint_data[i].pos << " ";
   std::cout << std::endl;
   std::cout << "vel:  ";
-  for(int i=0;i<12;++i) std::cout << state_rec.joint_state.joint_data[i].vel << " ";
+  for(int i=0;i<12;++i) std::cout << state_rec.joint_data[i].vel << " ";
   std::cout << std::endl;
   std::cout << "tor:  ";
-  for(int i=0;i<12;++i) std::cout << state_rec.joint_state.joint_data[i].tor << " ";
+  for(int i=0;i<12;++i) std::cout << state_rec.joint_data[i].tor << " ";
   std::cout << std::endl;
 }

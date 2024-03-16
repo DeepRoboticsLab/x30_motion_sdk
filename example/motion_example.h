@@ -67,6 +67,6 @@ class MotionExample{
     * @param data Current joint data
     * @param time Current timestamp
     */
-    void GetInitData(JointDataSDK data, double time);
+    void GetInitData(RobotDataSDK data, double time);
 };
 

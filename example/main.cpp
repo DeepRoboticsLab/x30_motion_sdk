@@ -53,7 +53,7 @@ int main(int argc, char* argv[]){
   send2robot_cmd->robot_state_init();                                 ///< Return all joints to zero and gain control
 
   start_time = my_set_timer.get_start_time();                         ///< Obtain time for algorithm usage
-  robot_set_up_demo.GetInitData(robot_data->joint_state, 0.000);       ///< Obtain all joint states once before each stage (action)
+  robot_set_up_demo.GetInitData(*robot_data, 0.000);       ///< Obtain all joint states once before each stage (action)
   
 /********************************************************/
   int time_tick = 0;
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]){
       robot_set_up_demo.PreStandUp(robot_joint_cmd, now_time, *robot_data);///< Stand up and prepare for action
     } 
     if(time_tick == 5000){
-      robot_set_up_demo.GetInitData(robot_data->joint_state, now_time);///< Obtain all joint states once before each stage (action)
+      robot_set_up_demo.GetInitData(*robot_data, now_time);///< Obtain all joint states once before each stage (action)
     }
     if(time_tick >= 5000 ){
       robot_set_up_demo.StandUp(robot_joint_cmd, now_time, *robot_data);///< Full stand up
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]){
 
 
 /*********A simple demo that stands up (for testing and can be deleted by yourself)*******/
-   if(is_message_updated_){
+    if(is_message_updated_){
         send2robot_cmd->set_send(robot_joint_cmd);  
     }               
     loopcount++;
