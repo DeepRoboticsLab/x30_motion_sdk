@@ -28,10 +28,10 @@ add_custom_command(TARGET deeprobotics_motion_sdk_${CMAKE_SYSTEM_PROCESSOR} POST
     COMMENT "Copying deeprobotics_motion_sdk_${CMAKE_SYSTEM_PROCESSOR} to python/lib"
 )
 
-option(BUILD_WITH_EXAMPLE ON)
+option(BUILD_EXAMPLE ON)
 option(BUILD_PYTHON ON)
 
-if(BUILD_WITH_EXAMPLE)
+if(BUILD_EXAMPLE)
   add_subdirectory(example)
 endif()
 

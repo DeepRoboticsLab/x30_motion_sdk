@@ -76,7 +76,8 @@ PYBIND11_MODULE(deeprobotics_motion_sdk_py, m) {
     .def(py::init<int32_t>())
     .def("register_call_back", &ParseCommand::RegisterCallBack)
     .def("start_work", &ParseCommand::startWork)
-    .def("get_state", &ParseCommand::getRecvState);
+    .def("get_state", &ParseCommand::getRecvState)
+    .def("print_data", &ParseCommand::printData);;
 
   py::class_<SendToRobot>(m, "SendToRobot")
     .def(py::init<std::string , uint16_t>())
