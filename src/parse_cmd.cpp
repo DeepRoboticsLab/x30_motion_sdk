@@ -14,7 +14,7 @@
 using namespace std;
 
 ParseCommand::ParseCommand(int port):local_port(port){
-
+  memset(&state_rec, 0, sizeof(state_rec));
 }
 
 void ParseCommand::work()

@@ -9,6 +9,9 @@ add_definitions(-w) # warning ignore
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CAMKE_CXX_FLAGS}")
 message("CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
 
+option(BUILD_EXAMPLE "Example for motion sdk in C++" ON)
+option(BUILD_PYTHON "Motion sdk python version" ON)
+
 foreach(VAR ${SRC_DIR_LIST})
   set(TEMP)
   aux_source_directory(./src/ TEMP)
@@ -28,8 +31,7 @@ add_custom_command(TARGET deeprobotics_motion_sdk_${CMAKE_SYSTEM_PROCESSOR} POST
     COMMENT "Copying deeprobotics_motion_sdk_${CMAKE_SYSTEM_PROCESSOR} to python/lib"
 )
 
-option(BUILD_EXAMPLE ON)
-option(BUILD_PYTHON ON)
+
 
 if(BUILD_EXAMPLE)
   add_subdirectory(example)
