@@ -1,21 +1,102 @@
-# 绝影X30运动控制SDK
+# Jueying X30 Motion SDK
 
+[简体中文](./README_ZH.md)
 
 &nbsp;
-##  1 远程连接
+## 1 SDK Change Log
 
-开发者可通过SSH远程连接到运动主机。
+### V1.0（2024-01-20）
+First release.
 
-- 将开发主机连接到机器人WiFi。
+&nbsp;
+## 2 SDK Introduction
+**MotionSDK** provides five control parameters to control the motion of joints: $pos_{goal}$, $vel_{goal}$, $kp$, $kd$, $t_{ff}$.
 
-- 在开发主机上打开SSH连接软件，输入`ssh ysc@192.168.1.103`，密码为 `'` [英文单引号]，即可远程连接运动主机。
+When SDK sends joint commands to the robot, the underlying controller will run the joint commands from SDK with priority and distribute the commands to the 12 joints of the robot. The final control signal for the joints can be calculated based on the five control parameters:
+$$T=kp*(pos_{goal} - pos_{real})+kd*(vel_{goal} - vel_{real})+t_{ff}$$
 
-- 输入以下命令以打开网络配置文件：
+The driver will convert final joint control signal into a desired current and perform closed-loop control at a frequency of 20kHz.
+
+When the underlying controller has not received the commands from SDK for more than 1 second, it will retrieve control right, enter a damping protection mode, and after a certain period, clear the joint commands.
+
+**Example of control parameters for various control methods:**
+
+Position Control:
+$$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=0, t_{ff} = 0$$
+Velocity Control:
+$$pos_{goal}=0, vel_{goal}=5, kp=0, kd=1, t_{ff} = 0$$
+Damping Control:
+$$pos_{goal}=0, vel_{goal}=0, kp=0, kd=1, t_{ff} = 0$$
+Torque Control:
+$$pos_{goal}=0, vel_{goal}=0, kp=0, kd=0, t_{ff} = 3$$
+Zero Torque Control:
+$$pos_{goal}=0, vel_{goal}=0, kp=0, kd=0, t_{ff} = 0$$
+Hybrid Control:
+$$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
+
+&nbsp;
+## 3 Parameters
+
+### 3.1 Body and Joint Coordinate System
+
+<img src="./doc/body.png" alt="a" style="zoom:100%;" />
+
+<img src="./doc/leg.png" alt="a" style="zoom:100%;" />
+
+> Caution: The arc-shaped arrow indicates the positive direction of rotation for the joint coordinate system with the same color.
+
+### 3.2 Link Lengths of Body
+
+<img src="./doc/body_length.png" alt="a" style="zoom:100%;" />
+
+| Parameter | Value     | Description                 |
+| ----------| -------- | -------------------- |
+| Lbody| 0.98m  | length of body           |
+| Lhip | 0.582m | distance between the centers of front hip and hind hip   |
+| Whip | 0.16m  | distance between the centers of left hip and right hip |
+| Wleg | 0.3935m| distance between the centers of left leg and right leg     |
+| Wbody| 0.454m | width of body|
+
+### 3.3 Link Lengths of Leg
+
+<img src="./doc/leg_length.png" alt="s" style="zoom:75%;" />
+
+| Parameter              | Value     | Description                       |
+| ---------------------- | -------- | ------------------------------ |
+| L1 | 0.1167m | distance between the centers of leg and HipX |
+| L2 | 0.3m     | length of upper leg       |
+| L3 | 0.31m    | length of lower leg       |
+| Rfoot | 0.039m    | foot radius           |
+
+### 3.4 Joint Parameters
+
+| **Joint**     | **Range** | **Nominal Torque** | **Nominal Velocity** | **Max Torque** |
+| ------------ | ------------ | ------------ | ------------ | ------------ |
+| HipX  | -18.5°~33.5° | 28N·m         | 12rad/s      | 84N·m         |
+| HipY  | -170°~15°    | 28N·m         | 12rad/s      | 84N·m         |
+| Knee  | 24°~140°     | 65N·m         | 11rad/s      | 180N·m        |
+
+> Caution: Additional dynamics parameters for Jueying X30 are available in the URDF file provided.
+
+&nbsp;
+## 4 SDK Download and Unzip
+
+- Download **X30_MotionSDK** and unzip.
+
+&nbsp; 
+## 5 Configure the Motion Host
+
+The developer can remotely connect to the motion host via ssh to configure the destination IP address for the motion host to send motion data such as joint data, and SDK-related parameters.
+
+- Connect the development host to the robot's WiFi.
+
+- Open the ssh connection software on the development host and enter`ssh ysc@192.168.1.103`, with the password `'` [a single quote], to connect to the motion host remotely.
+- Enter the following command to open the network config file:
 	```Bash
-	cd /home/ysc/jy_exe/conf/
+	cd ~/jy_exe/conf/
 	vim network.toml
 	```
-- 配置文件 ***network.toml*** 内容如下：
+- The config file ***network.toml*** has the following contents:
 	```toml
 	ip = '192.168.1.103'
 	target_port = 43897
@@ -24,59 +105,157 @@
 	ports = [43897,43897,43897]
 	```
 	
-- 修改配置文件第4行`ips`中的第3个IP地址，使得 **MotionSDK** 能够接收到机器狗数据:
-	- 如果 **MotionSDK** 在机器人运动主机内运行，IP设置为运动主机IP：`192.168.1.103`；  
-	- 如果 **MotionSDK** 在开发者自己的开发主机中运行，设置为开发主机的静态IP：`192.168.1.xxx`。
-	
-- 重启运动程序使配置生效：
+- When running, motion host will send joint data to the addresses included in  `ip` and `ips`.
+
+	- If **MotionSDK** is running within the motion host, please check if `ip` or `ips` already includes the motion host IP `192.168.1.103`. If it's not included, add it to `ips`, and also add the corresponding receiving port number in `ports`, which by default is `43897`.
+
+	- If **MotionSDK** is running on the developer's own development host, please add the static IP of the development host to `ips` as `192.168.1.xxx`, and add the corresponding receiving port number in `ports`, which by default is `43897`.
+
+- After the data reporting address is configured, you need to turn on the switch for the motion host to report data to the sdk, first open the config file ***sdk_config.toml***:
+	```Bash
+	cd ~/jy_exe/conf/
+	vim sdk_config.toml
+	```
+
+- Modify the value of `enable_joint_data` in the config file ***sdk_config.toml***:
+	```toml
+	enable_joint_data = true
+	```
+- In the same config file  ***sdk_config.toml***, the joint torque limits can be modified as required:
+	```toml
+	torque_limit=[42.0,42.0,90.0]
+	```
+	The array elements are defined as follows:
+
+	| Array Element | Meaning     | Range  |Type|
+	| --- | -------- | ---------- | ---------- |
+	| torque_limit[0] | hipx torque limit(N·m)| (0,84.0] | double |
+	| torque_limit[1] | hipy torque limit(N·m)| (0,84.0] | double |
+	| torque_limit[2] | knee torque limit(N·m)| (0,160.0] | double |
+
+	>Caution: When initially testing a new motion program, it is advisable to set the torque limiting to a lower level. Once the program has been verified without errors, the torque limiting can be gradually increased to ensure the robot remains in a safe state.
+
+- Restart the motion program to apply the new configuration:
 	```bash
-	cd /home/ysc/jy_exe
+	cd ~/jy_exe
 	sudo ./stop.sh
 	sudo ./restart.sh
 	```
 
-
 &nbsp;
-##  2 编译开发
+## 6 Compile and Run
 
-- 编译开发时，开发者可进入解压得到的文件夹，在***CMakeLists.txt*** 的同级目录下新建 ***build*** 文件夹；
+***main.cpp*** provides a simple demo of standing up, and after standing for a while, it returns control right to the underlying controller, and the robot automatically enters damping protection mode.
+
+
+<img src="./doc/demoFlowEN.png" alt="a" style="zoom:100%;" />
+
+
+**But to ensure the safe use of the SDK, in the original code of *main.cpp*,the code for sending joint control commands on line 80 is commented out, so the robot will only reset to zero by default but will not stand:**
+
+```c++
+//  send2robot_cmd->set_send(robot_joint_cmd);
+```
+
+> Caution: Before uncommenting, the developer must make sure that the communication between SDK and the robot is functioning properly (refer to "6.1 Check the Communication"), and make sure that the joint control commands sent by SDK are correct, to avoid posing a risk when executing the control commands!
+
+### 6.1 Check the Communication
+
+MotionSDK uses UDP to communicate with the robot.
+
+To check if SDK has successfully sent control commands to the robot, developers can observe the robot's actions when running the demo. If the robot prepared for standing, it proves that the SDK can successfully send commands to the robot.
+
+To check if the robot has successfully sent data to the SDK, developers can print data such as joint data or imu data using the SDK to determine whether the SDK received the data sent by the robot, or observe whether "No data from the robot was received!!!!!!" is printed when running the demo.
+
+- First compile the original codes.
+
+- Go into the unzipped folder, create a new ***build*** directory in the same directory as ***CMakeLists.txt***;
+
+	```bash
+	cd xxxxxxxx     # cd <path to where you want to create build directory>
+	mkdir build
+	```
+	> Caution: Developers can create ***build*** directory anywhere. However, the path to ***CMakeLists.txt*** is needed when running `cmake`.
+
+- Navigate to the ***build*** directory and then compile;
+	```bash
+	cd build
+ 	cmake .. 
+	make -j
+	```
+
+- After finishing compilation, an executable file named ***X30_motion*** will be generated in the ***build*** directory, which is the result of compilation;
+
+- Enter the following command in the terminal to run ***X30_motion*** (make sure the development host is connected to the robot network before running):
+
+	```bash
+	./X30_motion
+	```
+
+- Observe whether the robot prepares for standing when running ***X30_motion*** , and whether it is normal to print the data sent by the robot in the terminal.
+
+### 6.2 Communication Troubleshooting
+
+If SDK does not receive the data sent by the robot, you can follow the steps below to troubleshoot:
+
+- First check if the development host is under the same network segment as the robot host (this step can be skipped if you are running the SDK on the robot motion host):
+
+  - Connect the development host to the robot WiFi or Ethernet port, and then ping the motion host on the development host.
+
+  - If the ping shows the response, use SSH to connect to the robot motion host, and ping the static IP address of the development host from the motion host.
+
+  - If there is no reply, try to manually set the IP address of your development host and follow Chapter 5 again to configure the motion host.
+
+- If the development host is a virtual machine, it is recommended to configure bridged networking for your virtual machine, manually reset its IP address and reboot it. Then follow Chapter 5 again to configure the motion host.
+
+If SDK still can't receive the data sent by the robot, you can capture the packet on the motion host:
+
+- If **MotionSDK** is running on the robot motion host, run `sudo tcpdump -x port 43897 -i lo`;
+
+- If **MotionSDK** is running on development host, run `sudo tcpdump -x port 43897 -i eth1`.
+
+Wait for 2 minutes after entering the packet capture command,and observe whether the robot has sent raw data to SDK. If not, enter the top command to see if the process *jy_exe* (robot motion program)is running normally. If *jy_exe* is not running normally, refer to the following command to restart the motion program:
+
+```bash
+ cd ~/jy_exe
+ sudo ./stop.sh
+ sudo ./restart.sh
+```
+
+### 6.3 Compile and Develop
+
+After making sure that the SDK is communicating properly with the robot, and that your control commands are correct, you can uncomment the code `send2robot_cmd->set_send(robot_joint_cmd)` in line 80 in ***main.cpp***, recompile and run it again:
+
+- Delete the previously generated ***build*** directory:
+
+- Open a new terminal and create an empty ***build*** directory;
 
 	```bash
 	cd xxxxxxxx     # cd <path to where you want to create build directory>
 	mkdir build
 	```
 	
-	> 注意：开发者可在任何地方创建 ***build*** 文件夹，但在编译时，`cmake` 指令须指向 ***CMakeLists.txt*** 所在的路径。
+- Navigate to the ***build*** directory and then compile;
 
-- 打开 ***build*** 文件夹并编译；
-
-   ```bash
+	```bash
 	cd build
-	cmake .. 
+ 	cmake .. 
 	make -j
 	```
-	
-- 编译结束后，会在 ***build*** 目录下生成一个名为 ***X30_motion*** 的可执行文件，此即为我们代码编译出来的结果；
 
-- 在终端中继续输入以下命令行以运行程序：
+- After compilation, an executable file named ***X30_motion*** is generated in the ***build*** directory. Enter the following codes in terminal to run the program:
 
 	```bash
 	./X30_motion
 	```
-**在X30_MotionSDK的main.cpp中，倒数几行有一行被注释的指令下发代码**：
-
-```c++
-//send2robot_cmd->set_send(robot_joint_cmd);
-```
-
-**此为SDK下发指令的调用，为了确保SDK的安全使用，这行下发指令默认是注释掉的，机器狗默认只会回零不会起立。**
+> **Caution: When using Jueying X30 to test your motion control algorithms or do experiments, all present personnel should keep at least 5 meters away from the robot and the robot should be hung on the robot hoisting device, to avoid accidental damage to personnel and equipment. If the user needs to approach the robot during experiment, the user must ensure that either the robot is put into an emergency stop state or the motion program is shut down using the `sudo ./stop.sh`.**
 
 &nbsp;
-##  3 示例代码
+##  7 Example Code
 
-本节对 ***main.cpp*** 进行说明。  
+This chapter explains ***main.cpp*** . 
 
-定时器，用于设置算法周期，获得当前时间：
+Timer, used to set the algorithm period and obtain the current time:
 
 ```cpp
 TimeTool my_set_timer;
@@ -86,7 +265,7 @@ my_set_timer.time_interrupt()			      		              ///< Timer interrupt flag
 my_set_timer.get_now_time(double);               		          ///< Get the current time
 ```
 
-SDK在绑定机器人的IP和端口后，获取控制权， 发送关节控制指令：
+After binding the IP and port of the robot, SDK will acquire control right and can send the joint control commands:
 
 ```cpp
 SendToRobot* send2robot_cmd = new SendToRobot("192.168.1.103",43893);   ///< Create a sender thread
@@ -95,15 +274,14 @@ send2robot_cmd->set_send(RobotCmdSDK); 			     		            ///< Send joint con
 send2robot_cmd->control_get(int);                            		    ///< Return the control right
 ```
 
-SDK接收机器人下发的关节数据：
+SDK receives the joint data from the robot:
 
 ```cpp
 ParseCommand* robot_data_rec = new ParseCommand;           		  ///< Create a thread for receiving and parsing
 robot_data_rec->getRecvState(); 			      		          ///< Receive data from 12 joints
-
 ```
 
-SDK接收到的关节数据将保存在`robot_data`中：
+The data SDK received will be saved into `robot_data`:
 
 ```cpp
 RobotDataSDK *robot_data = &robot_data_rec->getRecvState(); 		  ///< Saving joint data to the robot_data
@@ -143,7 +321,7 @@ robot_data->joint_state.fl_leg[].velocity	  ///< Motor velocity of left front le
 robot_data->joint_state.joint_data            ///< All joint data
 ```
 
-机器人关节控制指令：
+Robot joint control command:
 
 ```cpp
 RobotCmdSDK robot_joint_cmd;  					  ///< Target data of each joint
@@ -160,10 +338,13 @@ robot_joint_cmd.fl_leg[]->torque;				  ///< Torue of left front leg
 robot_joint_cmd.fl_leg[]->velocity;				  ///< Velocity of left front leg
 ```
 
-机器人站立的简单demo：  
-1.将机器人腿收起来，为站立做准备；  
-2.记录下当前时间与关节数据；  
-3.机器人起立。
+A simple demo that can make the robot stand:
+
+1.**PreStanUp**: Draw the robot's legs in and prepare to stand;
+
+2.**GetInitData**: Record the current time and joint data; 
+
+3.**StandUp**: The robot stands up.
 
 ```cpp
 MotionExample robot_set_up_demo;                      		  ///< Demo for testing
@@ -186,197 +367,8 @@ robot_set_up_demo.GetInitData(robot_data->motor_state,now_time);
 robot_set_up_demo.StandUp(robot_joint_cmd,now_time,*robot_data);
 ```
 
-
 &nbsp;
-##  4 常见问题与注意事项
-### 问题一
+### Other Precautions
 
-**问：** 在自己的开发主机运行MotionSDK时，如何判断SDK是否与机器狗正常通讯？
-
-**答：**
-
-SDK采用UDP与机器狗进行通讯。
-
-针对数据上报，可以在SDK里打印关节数据或陀螺仪数据等信息，以此判断是否收到机器狗上报的SDK数据。或者观察SDK运行时，是否打印connection refused，以此判断是否收到机器狗上报的SDK数据。
-
-针对指令下发，如果SDK运行后，机器狗做出回零动作，则证明SDK能成功下发指令到机器狗本体。
-
-### 问题二
-
-**问：** 如果SDK没收到机器狗上报数据，如何解决？
-
-**答：**
-
-首先检查开发主机是否与机器狗主机能处于同一网段下，如果是在机器狗上运行SDK，此步骤可跳过。
-
-开发者先连接机器狗的WiFi网络，然后在自己的开发主机上`ping 192.168.1.103`，ping通之后ssh连接到机器狗运动主机内，在运动主机内`ping 192.168.1.xxx`，xxx为开发者开发主机的静态ip。
-
-如果上述步骤失败，可能需要开发者手动设置自己开发主机的ip地址。
-
-如果开发者的开发环境为虚拟机，建议把虚拟机网络连接方式改为桥接并手动设置虚拟机ip地址后重启虚拟机。
-
-其次检查是否按照教程里的"远程连接"部分正确设置机器狗上的配置文件。
-
-如果仍收不到机器狗上报数据，可在机器狗运动主机上运行`sudo tcpdump -x port 43897`，等待2分钟，观察机器狗是否有原始数据上报。如果没有，输入top命令查看机器狗本体控制程序进程jy_exe是否正常运行，若jy_exe没有正常运行，参照以下指令重启运动程序：
-
-```bash
- cd /home/ysc/jy_exe
- sudo ./stop.sh
- sudo ./restart.sh
-```
-
-
-
-### 问题三
-
-**问：** 下发控制指令不生效，机器人没反应？
-
-**答：**
-
-在X30_MotionSDK的main.cpp中，倒数几行有一行被注释的指令下发代码：
-
-```c++
-//send_cmd->SendCmd(robot_joint_cmd); 
-```
-
-此为SDK下发指令的调用，为了确保SDK的安全使用，这行**下发指令默认是注释掉的，机器狗默认只会回零不会起立。**
-
-取消注释前，请开发者务必确认上述问题一、二，确保SDK与机器狗正常通讯，同时确保自己的下发控制指令正确，否则机器狗执行控制指令时可能会产生危险！
-
-
-
-### 问题四
-
-**问：** 控制指令是如何生效的？
-
-**答：**
-
-提供goal_pos,goal_vel,kp,kd,t_ff，共5个关节控制参数接口，控制接口全为低速端，也就是**关节端**，最终关节目标力为
-$$
-T=kp*(pos_{goal} - pos_{real})+kd*(vel_{goal} - vel_{real})+t_{ff}
-$$
-驱动器端会将最终的关节目标力转化成期望电流，并以20kHz的频率进行闭环控制。
-
-**使用举例：**
-
-当做纯位控即位置控制时，电机的输出轴将会稳定在一个固定的位置。例如，如果我们希望电机输出端固定在3.14弧度的位置，下发数据格式示例：
-$$
-pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=0, t_{ff} = 0
-$$
-当做速度控制时，下发数据格式示例：
-$$
-pos_{goal}=0, vel_{goal}=5, kp=0, kd=1, t_{ff} = 0
-$$
-当做阻尼控制时，下发数据格式示例：
-$$
-pos_{goal}=0, vel_{goal}=0, kp=0, kd=1, t_{ff} = 0
-$$
-当做力矩控制时，下发数据格式示例：
-$$
-pos_{goal}=0, vel_{goal}=0, kp=0, kd=0, t_{ff} = 3
-$$
-当做零力矩控制时，下发数据格式示例：
-$$
-pos_{goal}=0, vel_{goal}=0, kp=0, kd=0, t_{ff} = 0
-$$
-当做混合控制时，下发数据格式示例：
-$$
-pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1
-$$
-
-
-### 问题五
-
-**问：** SDK的控制逻辑是怎样的？
-
-**答：**
-
-当SDK有指令下发时，底层控制器会优先执行SDK的控制指令，并把指令分发给机器狗12个关节。当SDK没有指令下发时，经过1s的超时判断后，底层控制器会拿回控制权，进入阻尼保护模式一段时间后，清空关节指令。控制流程图可以参考下图：
-<img src="./doc/MotionControlFlow.png" alt="a" style="zoom:100%;" />
-
-
-
-
-### 问题六 
-
-**问：** 如何修改关节力矩限幅？
-
-**答：**
-在机器狗运动主机内，执行如下指令
-```bash
- cd /home/ysc/jy_exe/conf
- vim sdk_config.toml
-```
-你将看到如下内容
-
-```toml
-torque_limit=[42.0,42.0,90.0]   
-```
-该数组的第1，2，3个数分别代表髋关节(hipx)，侧摆关节(hipy)，膝关节(knee)的力矩限幅，你可按需修改，建议在刚开始测试程序的时候将力矩限幅设置的较小一些，待程序验证无误后再放开力矩限幅，确保机器人处于安全的状态。
-
-**修改后，执行如下指令重启运动程序，使得修改生效**，
-```bash
-cd /home/ysc/jy_exe
-sudo ./stop.sh
-sudo ./restart.sh
-```
-
-
-
-### 其他注意事项
-
-1. X30运动主机是ARM架构的，如果开发者想在运动主机上编译自己的程序，需要注意。
-2. WiFi通讯受网络环境干扰产生的通讯延迟波动，可能对控制频率在500Hz以上的控制器有一定的影响。
-
-
-
-## 5 硬件参数
-
-### 1.身体与关节坐标系
-
-<img src="./doc/body.png" alt="a" style="zoom:100%;" />
-
-<img src="./doc/leg.png" alt="a" style="zoom:100%;" />
-
-【注意】弧形箭头指示颜色相同的关节坐标系的旋转正方向。
-
-
-
-### 2.身体连杆参数
-
-<img src="./doc/body_length.png" alt="a" style="zoom:100%;" />
-
-| 参数                 | 数值     | 说明                 |
-| -------------------- | -------- | -------------------- |
-| 长度(Lbody)          | 0.98m    | 身体总长度           |
-| 髋前后间距(Lhip)     | 0.584m   | 前后髋关节中心距离   |
-| 髋左右间距(Whip)     | 0.16m    | 左右髋关节中心的距离 |
-| 腿平面左右间距(Wleg) | 0.39284m | 腿平面左右的距离     |
-| 宽度(Wbody)          | 0.47m    | 身体总宽度           |
-
-
-
-### 3.腿部连杆参数
-
-<img src="./doc/leg_length.png" alt="s" style="zoom:75%;" />
-
-| 参数                       | 数值     | 说明                           |
-| -------------------------- | -------- | ------------------------------ |
-| 腿平面与髋侧摆关节距离(L1) | 0.11642m | 髋侧摆关节与腿平面距离         |
-| 大腿长度(L2)               | 0.3m     | 髋前摆关节中心与膝关节中心距离 |
-| 小腿长度(L3)               | 0.31m    | 膝关节中心与足底圆心距离       |
-| 足底半径                   | 0.03m    | 足底缓冲件半径                 |
-
-
-
-### 4.关节参数
-
-| **关节**     | **运动范围** | **额定转矩** | **额定转速** | **峰值转矩** |
-| ------------ | ------------ | ------------ | ------------ | ------------ |
-| 髋侧摆(HipX) | -18.5°~33.5° | 28Nm         | 12rad/s      | 84Nm         |
-| 髋前摆(HipY) | -170°~15°    | 28Nm         | 12rad/s      | 84Nm         |
-| 膝关节(Knee) | 20°~145°     | 65Nm         | 11rad/s      | 180Nm        |
-
-
-
-【注意】其他有关于X30四足机器人的动力学参数可以在提供的URDF文件中获得
+1. X30 motion host is an ARM architecture and developers need to be careful if they want to run their programs on the motion host.
+2. WiFi communication latency fluctuation caused by interference in the network environment may have a certain impact on controllers with control frequencies above 500Hz.

@@ -39,17 +39,17 @@ typedef struct{
   float temperature;
 }SingleJointData;
 
-struct JointDataSDK{
-  union{
-    SingleJointData joint_data[12];
-    struct {
-      SingleJointData fl_leg[3];
-      SingleJointData fr_leg[3];
-      SingleJointData hl_leg[3];
-      SingleJointData hr_leg[3];
-    };
-  };
-};
+// struct JointDataSDK{
+//   union{
+//     std::array<SingleJointData, 12> joint_data;
+//     struct {
+//       std::array<SingleJointData, 3> fl_leg;
+//       std::array<SingleJointData, 3> fr_leg;
+//       std::array<SingleJointData, 3> hl_leg;
+//       std::array<SingleJointData, 3> hr_leg;
+//     };
+//   };
+// };
 
 typedef struct{
   float pos;
@@ -61,12 +61,12 @@ typedef struct{
 
 struct RobotCmdSDK{
   union{
-    SingleJointCmd joint_cmd[12];
+    std::array<SingleJointCmd, 12> joint_cmd;
     struct {
-      SingleJointCmd fl_leg[3];
-      SingleJointCmd fr_leg[3];
-      SingleJointCmd hl_leg[3];
-      SingleJointCmd hr_leg[3];
+      std::array<SingleJointCmd, 3> fl_leg;
+      std::array<SingleJointCmd, 3> fr_leg;
+      std::array<SingleJointCmd, 3> hl_leg;
+      std::array<SingleJointCmd, 3> hr_leg;
     };
   };
 };
@@ -75,15 +75,23 @@ struct RobotCmdSDK{
 typedef struct{
   uint32_t tick;
   ImuDataSDK imu;
-  JointDataSDK joint_state;
+  union{
+    std::array<SingleJointData, 12> joint_data;
+    struct {
+      std::array<SingleJointData, 3> fl_leg;
+      std::array<SingleJointData, 3> fr_leg;
+      std::array<SingleJointData, 3> hl_leg;
+      std::array<SingleJointData, 3> hr_leg;
+    };
+  };
   union{
     struct{
-      float fl_force[3];
-      float fr_force[3];
-      float hl_force[3];
-      float hr_force[3];
+      std::array<float, 3> fl_force;
+      std::array<float, 3> fr_force;
+      std::array<float, 3> hl_force;
+      std::array<float, 3> hr_force;
     };
-    float contact_force[12];
+    std::array<float, 12> contact_force;
   };
 }RobotDataSDK;
 

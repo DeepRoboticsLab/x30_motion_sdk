@@ -14,7 +14,7 @@
 using namespace std;
 
 ParseCommand::ParseCommand(int port):local_port(port){
-
+  memset(&state_rec, 0, sizeof(state_rec));
 }
 
 void ParseCommand::work()
@@ -31,7 +31,10 @@ void ParseCommand::work()
       switch (cm.command.code){
         case STATE_RECEIVE_CODE:
           clock_gettime(1, &test_time);
-          memcpy(&state_rec, cm.data_buffer, sizeof(state_rec));
+          memcpy(&state_rec, cm.data_buffer, sizeof(state_rec));   
+          if(CallBack_){
+            CallBack_(STATE_RECEIVE_CODE);
+          }
           break;
       default:
         break;
@@ -75,12 +78,12 @@ void ParseCommand::printData(){
 
   std::cout << "Leg Data:  " << std::endl;
   std::cout << "pos:  ";
-  for(int i=0;i<12;++i) std::cout << state_rec.joint_state.joint_data[i].pos << " ";
+  for(int i=0;i<12;++i) std::cout << state_rec.joint_data[i].pos << " ";
   std::cout << std::endl;
   std::cout << "vel:  ";
-  for(int i=0;i<12;++i) std::cout << state_rec.joint_state.joint_data[i].vel << " ";
+  for(int i=0;i<12;++i) std::cout << state_rec.joint_data[i].vel << " ";
   std::cout << std::endl;
   std::cout << "tor:  ";
-  for(int i=0;i<12;++i) std::cout << state_rec.joint_state.joint_data[i].tor << " ";
+  for(int i=0;i<12;++i) std::cout << state_rec.joint_data[i].tor << " ";
   std::cout << std::endl;
 }

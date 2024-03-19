@@ -41,7 +41,9 @@ class ParseCommand{
     void setDataRevState(int state){
       is_data_recv = state > 0? 1:0;
     }
-
+    /// @brief CallBack_. 
+    /// @param int Instruction type, only 0x0906.
+    std::function<void(int)> CallBack_;
   public:
     /**
      * @brief  
@@ -58,6 +60,10 @@ class ParseCommand{
     * @brief Receive robot data and save it
     */
     void work();
+    /// @brief Registering Callbacks.
+    void RegisterCallBack(std::function<void(int)> CallBack){
+      CallBack_ = std::move(CallBack);
+    }
 
     RobotDataSDK& getRecvState(); /**< Save the obtained data in st.*/
 

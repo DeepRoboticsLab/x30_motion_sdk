@@ -101,7 +101,7 @@ class SendToRobot{
           cmd.joint_cmd[i].tor = 0.0;
           cmd.joint_cmd[i].vel = 0.0;
           cmd.joint_cmd[i].kp = 0.0;
-          cmd.joint_cmd[i].kd = 15.0;
+          cmd.joint_cmd[i].kd = 12.5;
         }
         set_send(cmd);
         sleep(5);
