@@ -184,9 +184,10 @@ MotionSDK采用UDP与机器狗进行通讯。
 - 打开 ***build*** 文件夹并编译；
 	```bash
 	cd build
+
  	cmake .. 
-	make -j
-	```
+ 	make -j
+ 	```
 
 - 编译结束后，会在 ***build*** 目录下生成一个名为 ***X30_motion*** 的可执行文件，此即为我们代码编译出来的结果；
 
@@ -235,13 +236,14 @@ MotionSDK采用UDP与机器狗进行通讯。
 - 打开 ***build*** 文件夹并编译；
 	```bash
 	cd build
- 	cmake .. 
-	make -j
-	```
-- 编译结束后，会在 ***build*** 目录下生成一个名为 ***X30_motion*** 的可执行文件，运行该文件时，机器狗将会执行下发的控制指令：
+
+ 	cmake .. -DBUILD_EXAMPLE=ON
+ 	make -j
+ 	```
+- 编译结束后，会在 ***build/example*** 目录下生成一个名为 ***motion_example*** 的可执行文件，运行该文件时，机器狗将会执行下发的控制指令：
 
 	```bash
-	./X30_motion
+	./example/motion_example
 	```
 > **注意：用户在使用X30执行算法和实验的过程中，请与机器狗保持至少5米距离，并将机器狗悬挂在调试架上避免意外造成人员和设备损伤。若实验过程中，机器狗摔倒或者用户想搬动机器狗位置，需要靠近机器狗时，用户应当使得机器狗处于急停状态或者使用 `sudo ./stop.sh` 命令关闭运动程序。**
 
@@ -359,7 +361,33 @@ robot_set_up_demo.GetInitData(robot_data->motor_state,now_time);
 robot_set_up_demo.StandUp(robot_joint_cmd,now_time,*robot_data);
 ```
 
-&nbsp;
+
+
+## 8 python版本
+
+### 8.1 编译生成
+
+python版本程序采用pybind的形式生成，需要在6.3的步骤中增加编译选项（默认添加）,之后编译
+
+```
+cmake .. -DBUILD_PYTHON=ON
+make -j
+```
+
+正常情况下编译好的动态库文件会自动复制到 ***python/lib*** 目录下
+
+### 8.2 运行demo
+
+在 ***python***目录下 直接执行motion_example.py文件，效果与C++版本sdk一样
+
+```
+cd /python
+python motion_example.py
+```
+
+
+###### &nbsp;
+
 ### 其他注意事项
 
 1. X30运动主机是ARM架构的，如果开发者想在运动主机上编译自己的程序，需要注意。
