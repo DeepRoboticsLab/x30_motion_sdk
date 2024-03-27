@@ -229,6 +229,7 @@ MotionSDK采用UDP与机器狗进行通讯。
 - 打开一个新的终端，新建一个空的 ***build*** 文件夹；
 
 	```bash
+	git clone --recurse-submodules git@github.com:DeepRoboticsLab/X30_MotionSDK.git
 	cd xxxxxxxx     # cd <path to where you want to create build directory>
 	mkdir build
 	```
