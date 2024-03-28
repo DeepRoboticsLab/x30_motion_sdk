@@ -12,7 +12,7 @@ using namespace std;
 
 const double kDegree2Radian = 3.1415926 / 180;
 
-class MotionExample{
+class MotionSDKExample{
   private:
 
   public:

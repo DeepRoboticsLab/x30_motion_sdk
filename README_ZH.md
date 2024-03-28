@@ -342,7 +342,7 @@ robot_joint_cmd.fl_leg[]->velocity;				  ///< Velocity of left front leg
 3.StandUp：机器狗起立。
 
 ```cpp
-MotionExample robot_set_up_demo;                      		  ///< Demo for testing
+MotionSDKExample robot_set_up_demo;                      		  ///< Demo for testing
 
 /// @brief Spend 1 sec drawing the robot's legs in and preparing to stand
 /// @param cmd Send control command

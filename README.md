@@ -347,7 +347,7 @@ A simple demo that can make the robot stand:
 3.**StandUp**: The robot stands up.
 
 ```cpp
-MotionExample robot_set_up_demo;                      		  ///< Demo for testing
+MotionSDKExample robot_set_up_demo;                      		  ///< Demo for testing
 
 /// @brief Spend 1 sec drawing the robot's legs in and preparing to stand
 /// @param cmd Send control command

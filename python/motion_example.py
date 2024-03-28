@@ -17,7 +17,7 @@ init_angle_fr = np.zeros(3)
 init_angle_hl = np.zeros(3)
 init_angle_hr = np.zeros(3)
 
-class MotionExample:
+class MotionSDKExample:
     def __init__(self):
         self.init_time = 0.0
      
@@ -150,7 +150,7 @@ if __name__ == "__main__" :
     
     start_time = timer.get_start_time()
     
-    robot_set_up_demo = MotionExample()
+    robot_set_up_demo = MotionSDKExample()
     robot_set_up_demo.GetInitData(receiver.get_data(), 0.000)
     
     time_tick = 0
