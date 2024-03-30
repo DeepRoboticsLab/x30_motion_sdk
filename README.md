@@ -5,12 +5,15 @@
 &nbsp;
 ## 1 SDK Change Log
 
-### V1.0（2024-01-20）
+### V1.0 (2024-01-20)
 First release.
+
+### V2.0 (2024-03-29)
+Add python version.
 
 &nbsp;
 ## 2 SDK Introduction
-**MotionSDK** provides five control parameters to control the motion of joints: $pos_{goal}$, $vel_{goal}$, $kp$, $kd$, $t_{ff}$.
+**MotionSDK** is used for motion control algorithms development, supports C++ and Python. It provides five control parameters to control the motion of joints: $pos_{goal}$, $vel_{goal}$, $kp$, $kd$, $t_{ff}$.
 
 When SDK sends joint commands to the robot, the underlying controller will run the joint commands from SDK with priority and distribute the commands to the 12 joints of the robot. The final control signal for the joints can be calculated based on the five control parameters:
 $$T=kp*(pos_{goal} - pos_{real})+kd*(vel_{goal} - vel_{real})+t_{ff}$$
@@ -79,14 +82,20 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 > Caution: Additional dynamics parameters for Jueying X30 are available in the URDF file provided.
 
 &nbsp;
-## 4 SDK Download and Unzip
+## 4 SDK Download
 
-- Download **X30_MotionSDK** and unzip.
+Clone **X30_MotionSDK** repository to local host:
+```bash
+cd xxxxxxxxxx    #cd <to where you want to store this project>
+git clone --recurse-submodules git@github.com:DeepRoboticsLab/X30_MotionSDK.git
+```
 
 &nbsp; 
 ## 5 Configure the Motion Host
 
 The developer can remotely connect to the motion host via ssh to configure the destination IP address for the motion host to send motion data such as joint data, and SDK-related parameters.
+
+The default port number for SDK to receive data reported by the motion host is 43897. The port number for the C++ project can be modified in ***/include/parse_cmd.h*** , and for the Python project, it can be modified in ***/python/motion_sdk_example.py*** .
 
 - Connect the development host to the robot's WiFi.
 
@@ -96,7 +105,7 @@ The developer can remotely connect to the motion host via ssh to configure the d
 	cd ~/jy_exe/conf/
 	vim network.toml
 	```
-- The config file ***network.toml*** has the following contents:
+- In the config file ***network.toml*** , `ip` and `target_port` form a pair consisting of an IP address and a port number. The addresses in the `ips` correspond to the port numbers in `ports` in sequential order. The specific contents of the file are as follows:
 	```toml
 	ip = '192.168.1.103'
 	target_port = 43897
@@ -105,11 +114,11 @@ The developer can remotely connect to the motion host via ssh to configure the d
 	ports = [43897,43897,43897]
 	```
 	
-- When running, motion host will send joint data to the addresses included in  `ip` and `ips`.
+- When running, motion host will send joint data to the addresses contained in the `ip` and `ips` of the configuration file, along with their corresponding port numbers.
 
-	- If **MotionSDK** is running within the motion host, please check if `ip` or `ips` already includes the motion host IP `192.168.1.103`. If it's not included, add it to `ips`, and also add the corresponding receiving port number in `ports`, which by default is `43897`.
+	- If **MotionSDK** is running within the motion host, please ensure that `ip` or `ips` already includes the motion host IP `192.168.1.103`, along with the corresponding port number matching the port number where the program is receiving data.
 
-	- If **MotionSDK** is running on the developer's own development host, please add the static IP of the development host to `ips` as `192.168.1.xxx`, and add the corresponding receiving port number in `ports`, which by default is `43897`.
+	- If **MotionSDK** is running on the developer's own development host, please add the static IP of the development host to `ips` as `192.168.1.xxx`, and add the port number of the program receiving data at the corresponding position in `ports`.
 
 - After the data reporting address is configured, you need to turn on the switch for the motion host to report data to the sdk, first open the config file ***sdk_config.toml***:
 	```Bash
@@ -117,7 +126,7 @@ The developer can remotely connect to the motion host via ssh to configure the d
 	vim sdk_config.toml
 	```
 
-- Modify the value of `enable_joint_data` in the config file ***sdk_config.toml***:
+- Modify the value of `enable_joint_data` in the config file ***sdk_config.toml*** (If this file does not exist, please create it):
 	```toml
 	enable_joint_data = true
 	```
@@ -145,54 +154,33 @@ The developer can remotely connect to the motion host via ssh to configure the d
 &nbsp;
 ## 6 Compile and Run
 
-***main.cpp*** provides a simple demo of standing up, and after standing for a while, it returns control right to the underlying controller, and the robot automatically enters damping protection mode.
-
+The example codes ***/example/main.cpp*** (C++ version) and ***/python/motion_example.py*** (Python version) provide a simple demo of standing up, and after standing for a while, it returns control right to the underlying controller, and the robot automatically enters damping protection mode.
 
 <img src="./doc/demoFlowEN.png" alt="a" style="zoom:100%;" />
 
+**But to ensure the safe use of the SDK, in the original code of the two demos, the code for sending joint control commands is commented out:**   
 
-**But to ensure the safe use of the SDK, in the original code of *main.cpp*,the code for sending joint control commands on line 80 is commented out, so the robot will only reset to zero by default but will not stand:**
-
+C++ ( */example/main.cpp* ):
 ```c++
-//  send2robot_cmd->set_send(robot_joint_cmd);
+// if(is_message_updated_){
+//   send2robot_cmd->set_send(robot_joint_cmd);  
+// }               
 ```
+Python ( */python/motion_sdk_example.py* ):
+```python
+# sender.set_send(robot_joint_cmd)
+```
+**Caution: Before uncommenting, the developer must make sure that the communication between SDK and the robot is functioning properly (refer to "6.1 Check the Communication"), and make sure that the joint control commands sent by SDK are correct, to avoid posing a risk when executing the control commands!**
 
-> Caution: Before uncommenting, the developer must make sure that the communication between SDK and the robot is functioning properly (refer to "6.1 Check the Communication"), and make sure that the joint control commands sent by SDK are correct, to avoid posing a risk when executing the control commands!
+**Caution: When using Jueying X30 to test your motion control algorithms or do experiments, all present personnel should keep at least 5 meters away from the robot and the robot should be hung on the robot hoisting device, to avoid accidental damage to personnel and equipment. If the user needs to approach the robot during experiment, the user must ensure that either the robot is put into an emergency stop state or the motion program is shut down using the `sudo ./stop.sh`.**
 
 ### 6.1 Check the Communication
 
 MotionSDK uses UDP to communicate with the robot.
 
-To check if SDK has successfully sent control commands to the robot, developers can observe the robot's actions when running the demo. If the robot prepared for standing, it proves that the SDK can successfully send commands to the robot.
-
 To check if the robot has successfully sent data to the SDK, developers can print data such as joint data or imu data using the SDK to determine whether the SDK received the data sent by the robot, or observe whether "No data from the robot was received!!!!!!" is printed when running the demo.
 
-- First compile the original codes.
-
-- Go into the unzipped folder, create a new ***build*** directory in the same directory as ***CMakeLists.txt***;
-
-	```bash
-	cd xxxxxxxx     # cd <path to where you want to create build directory>
-	mkdir build
-	```
-	> Caution: Developers can create ***build*** directory anywhere. However, the path to ***CMakeLists.txt*** is needed when running `cmake`.
-
-- Navigate to the ***build*** directory and then compile;
-	```bash
-	cd build
- 	cmake .. 
-	make -j
-	```
-
-- After finishing compilation, an executable file named ***X30_motion*** will be generated in the ***build*** directory, which is the result of compilation;
-
-- Enter the following command in the terminal to run ***X30_motion*** (make sure the development host is connected to the robot network before running):
-
-	```bash
-	./X30_motion
-	```
-
-- Observe whether the robot prepares for standing when running ***X30_motion*** , and whether it is normal to print the data sent by the robot in the terminal.
+Refer to 6.3 to compile and run the original example codes and observe whether it is normal to print the data sent by the robot in the terminal.
 
 ### 6.2 Communication Troubleshooting
 
@@ -215,45 +203,59 @@ If SDK still can't receive the data sent by the robot, you can capture the packe
 - If **MotionSDK** is running on development host, run `sudo tcpdump -x port 43897 -i eth1`.
 
 Wait for 2 minutes after entering the packet capture command,and observe whether the robot has sent raw data to SDK. If not, enter the top command to see if the process *jy_exe* (robot motion program)is running normally. If *jy_exe* is not running normally, refer to the following command to restart the motion program:
-
 ```bash
  cd ~/jy_exe
  sudo ./stop.sh
  sudo ./restart.sh
 ```
-
 ### 6.3 Compile and Develop
 
-After making sure that the SDK is communicating properly with the robot, and that your control commands are correct, you can uncomment the code `send2robot_cmd->set_send(robot_joint_cmd)` in line 80 in ***main.cpp***, recompile and run it again:
+After ensuring that the SDK communicates properly with the robot and confirming that your control commands are correct, you can uncomment the code for sending commands to the robot in the original code, then recompile and run it.
 
-- Delete the previously generated ***build*** directory:
+#### 6.3.1 C++
+Open a new terminal and create an empty ***build*** directory (Or empty all contents in the ***build*** directory if it has already been created):
+```bash
+cd xxxxxxxx     # cd <path to where you want to create build directory>
+mkdir build
+```
 
-- Open a new terminal and create an empty ***build*** directory;
+Navigate to the ***build*** directory and then compile:
+```bash
+cd build
+cmake .. -DBUILD_EXAMPLE=ON
+make -j
+```
 
-	```bash
-	cd xxxxxxxx     # cd <path to where you want to create build directory>
-	mkdir build
-	```
-	
-- Navigate to the ***build*** directory and then compile;
+After compilation, an executable file named ***motion_sdk_example*** is generated in the ***/build/example*** directory. Enter the following codes in terminal to run the program:
+```bash
+./example/motion_sdk_example
+```
 
-	```bash
-	cd build
- 	cmake .. 
-	make -j
-	```
+#### 6.3.2 Python
+SDK for Python programmers uses Pybind to create Python bindings for C++ libraries. 
+If you have compiled the C++ example codes, you can directly navigate to the existing ***build*** directory. If you have never compiled the example codes, please create a new ***build*** directory first:
+```bash
+cd xxxxxxxx     # cd <path to where you want to create build directory>
+mkdir build
+```
 
-- After compilation, an executable file named ***X30_motion*** is generated in the ***build*** directory. Enter the following codes in terminal to run the program:
+Navigate to the ***build*** directory and then compile:
+```bash
+cd build
+cmake .. -DBUILD_PYTHON=ON
+make -j
+```
 
-	```bash
-	./X30_motion
-	```
-> **Caution: When using Jueying X30 to test your motion control algorithms or do experiments, all present personnel should keep at least 5 meters away from the robot and the robot should be hung on the robot hoisting device, to avoid accidental damage to personnel and equipment. If the user needs to approach the robot during experiment, the user must ensure that either the robot is put into an emergency stop state or the motion program is shut down using the `sudo ./stop.sh`.**
+Normally, the compiled dynamic library files will be automatically copied to the ***/python/lib*** directory. Then you can navigate to the ***/X30_MotionSDK/python*** directory and directly execute ***motion_sdk_example.py***:
+```bash
+cd /python
+python motion_sdk_example.py
+```
 
 &nbsp;
-##  7 Example Code
+##  7 Example Code (C++)
 
-This chapter explains ***main.cpp*** . 
+This chapter explains ***/example/main.cpp*** . 
 
 Timer, used to set the algorithm period and obtain the current time:
 

@@ -8,9 +8,12 @@
 ### V1.0（2024-01-20） 
 **[新增]** 首次发布。 
 
+### V2.0（2024-03-29）
+**[新增]** python版本。
+
 &nbsp;
 ##  2 SDK简介
-**MotionSDK** 提供了低速端（即**关节端**）的5个控制参数接口： $pos_{goal}$， $vel_{goal}$， $kp$， $kd$， $t_{ff}$。
+**MotionSDK** 是用于开发运动控制算法的SDK，支持C++和Python，提供了低速端（即**关节端**）的5个控制参数接口： $pos_{goal}$， $vel_{goal}$， $kp$， $kd$， $t_{ff}$。
 
 当SDK有指令下发时，底层控制器会优先执行SDK的控制指令，将指令分发给机器狗的12个关节。底层关节根据5个控制参数可计算出最终关节目标力为：
 $$T=kp*(pos_{goal} - pos_{real})+kd*(vel_{goal} - vel_{real})+t_{ff}$$
@@ -83,16 +86,21 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 > 注意：绝影X30四足机器人的其他动力学参数可以在提供的URDF文件中获得。
 
 &nbsp;
-## 4 SDK下载及解压
+## 4 SDK包下载
 
-- 下载 **X30_MotionSDK**，并解压。
-
+使用git工具将 **X30_MotionSDK** 代码仓库克隆到本地:
+```bash
+cd xxxxxxxxxx    #cd <to where you want to store this project>
+git clone --recurse-submodules git@github.com:DeepRoboticsLab/X30_MotionSDK.git
+```
 &nbsp; 
 ## 5 配置SDK参数和数据上报地址
 
 开发者可通过ssh远程连接到运动主机，以配置运动主机上报关节等运动数据的目标地址和sdk相关参数。
 
-- 将开发主机连接到机器狗WiFi。
+SDK接收运动主机上报的数据的端口号默认为`43897`，C++版本的端口号可以在 ***/include/parse_cmd.h*** 中修改，Python版本的端口号可以在 ***/python/motion_sdk_example.py*** 中修改。
+
+- 首先将开发主机连接到机器狗WiFi。
 
 - 在开发主机上打开ssh连接软件，输入`ssh ysc@192.168.1.103`，密码为 `'` [英文单引号]，即可远程连接运动主机。
 
@@ -101,7 +109,8 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 	cd ~/jy_exe/conf/
 	vim network.toml
 	```
-- 配置文件 ***network.toml*** 内容如下：
+
+- 配置文件 ***network.toml*** 中，`ip`与`target_port`为一组IP地址和端口号，`ips`中的地址和`ports`中的端口号按顺序分别对应，配置文件具体内容如下：
 	```toml
 	ip = '192.168.1.103'
 	target_port = 43897
@@ -110,13 +119,13 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 	ports = [43897,43897,43897]
 	```
 	
-- 运动程序运行时，会向配置文件中的`ip`和`ips`所包含的地址上报运动状态数据。
+- 运动程序运行时，会向配置文件中的`ip`和`ips`所包含的地址以及其对应的端口号上报运动状态数据。
 
-	- 如果 **MotionSDK** 在机器狗运动主机内运行，请查看`ip`或`ips`是否已包含运动主机IP `192.168.1.103`，如果未包含，请在`ips`中添加，并在`ports`中对应的位置也添加上接受数据的端口号，默认是`43897`；
+	- 如果 **MotionSDK** 在机器狗运动主机内运行，请确保配置文件中`ip`或`ips`已包含运动主机IP `192.168.1.103`，以及对应的端口号与程序接收数据的端口号一致；
 
-	- 如果 **MotionSDK** 在开发者自己的开发主机中运行，请在`ips`中添加开发主机的静态IP `192.168.1.xxx`，并在`ports`中对应的位置添加上接受数据的端口号，默认是`43897`。
+	- 如果 **MotionSDK** 在开发者自己的开发主机中运行，请在`ips`中添加开发主机的静态IP `192.168.1.xxx`，并在`ports`中对应的位置添加上程序接受数据的端口号。
 
-- 数据上报地址配置完成后，需要将运动主机向sdk上报数据的开关打开，首先打开配置文件 ***sdk_config.toml*** :
+- 数据上报地址配置完成后，需要将运动主机向sdk上报数据的开关打开，首先打开配置文件 ***sdk_config.toml*** （如果没有的话，请先新建该文件）:
 	```Bash
 	cd ~/jy_exe/conf/
 	vim sdk_config.toml
@@ -126,6 +135,7 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 	```toml
 	enable_joint_data = true
 	```
+
 - 在同一个配置文件 ***sdk_config.toml*** 中，可按需对关节力矩限幅进行修改：
 	```toml
 	torque_limit=[42.0,42.0,90.0]
@@ -150,54 +160,33 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 &nbsp;
 ## 6 编译开发
 
-***main.cpp***中提供了机器狗站立的简单demo，并在完成站立一段时间后将控制权归还给底层控制器，进入阻尼保护模式：
+C++版例程 ***/example/main.cpp*** 和Python版例程 ***/python/motion_example.py*** 提供了机器狗站立的简单demo，并在完成站立一段时间后将控制权归还给底层控制器，进入阻尼保护模式：
 
 <img src="./doc/demoFlow.png" alt="a" style="zoom:100%;" />
 
+**但为了确保SDK的安全使用，在两个例程的原始代码中，下发指令到机器狗的代码是被注释掉的：**  
 
-**但为了确保SDK的安全使用，在*main.cpp*的原始代码中，第80行的下发指令代码是被注释掉的，因此机器狗默认只会调整到准备起立姿势但不会起立：**
-
+C++版例程( */example/main.cpp* )：
 ```c++
-//  send2robot_cmd->set_send(robot_joint_cmd);
+// if(is_message_updated_){
+//   send2robot_cmd->set_send(robot_joint_cmd);  
+// }               
 ```
+Python版例程( */python/motion_sdk_example.py* ):
+```python
+# sender.set_send(robot_joint_cmd)
+```
+**注意：在取消注释前，开发者务必确保SDK与机器狗正常通讯（可参考“6.1 检查通讯”），并确保自己的下发控制指令正确，否则机器狗执行控制指令时可能会产生危险！**
 
-> 注意：在取消注释前，开发者务必确保SDK与机器狗正常通讯（可参考“6.1 检查通讯”），并确保自己的下发控制指令正确，否则机器狗执行控制指令时可能会产生危险！
+**注意：用户在使用绝影X30执行算法和实验的过程中，请与机器狗保持至少5米距离，并将机器狗悬挂在调试架上避免意外造成人员和设备损伤。若实验过程中，机器狗摔倒或者用户想搬动机器狗位置，需要靠近机器狗时，用户应当使得机器狗处于急停状态或者使用 `sudo ./stop.sh` 命令关闭运动程序。**
 
 ### 6.1 检查通讯
 
 MotionSDK采用UDP与机器狗进行通讯。
 
-针对指令下发，如果SDK运行后，机器狗做出准备起立姿势，则证明SDK能成功下发指令到机器狗本体。
-
 针对数据上报，可以在SDK里打印关节数据或陀螺仪数据等信息，以此判断是否收到机器狗上报的SDK数据；或者观察SDK运行时，是否打印“No data from the robot was received!!!!!!”，以此判断是否收到机器狗上报的SDK数据。
 
-- 首先对未取消下发指令注释的代码进行编译。
-
-- 进入解压得到的文件夹，在***CMakeLists.txt*** 的同级目录下新建 ***build*** 文件夹；
-
-	```bash
-	cd xxxxxxxx     # cd <path to where you want to create build directory>
-	mkdir build
-	```
-	> 注意：开发者可在任何地方创建 ***build*** 文件夹，但在编译时，`cmake` 指令须指向 ***CMakeLists.txt*** 所在的路径。
-
-- 打开 ***build*** 文件夹并编译；
-	```bash
-	cd build
-
- 	cmake .. 
- 	make -j
- 	```
-
-- 编译结束后，会在 ***build*** 目录下生成一个名为 ***X30_motion*** 的可执行文件，此即为我们代码编译出来的结果；
-
-- 在终端中继续输入以下命令行以运行程序（运行前请确保开发主机已连入机器狗网络）：
-
-	```bash
-	./X30_motion
-	```
-
-- 观察程序运行过程中机器狗是否做出准备起立姿势，以及终端中打印机器狗上报数据是否正常。
+请参考6.3节对原始代码进行编译和运行，并观察程序运行过程中终端打印机器狗上报数据是否正常。
 
 ### 6.2 通讯问题排查
 
@@ -220,38 +209,57 @@ MotionSDK采用UDP与机器狗进行通讯。
  sudo ./stop.sh
  sudo ./restart.sh
 ```
+
 ### 6.3 编译开发
+确保SDK与机器狗正常通讯，并确保自己的下发控制指令正确后，可以将原始代码中下发指令到机器狗的代码取消注释，然后重新编译运行。
 
-确保SDK与机器狗正常通讯，并确保自己的下发控制指令正确后，可以将***main.cpp***原始代码中第80行的下发指令代码`send2robot_cmd->set_send(robot_joint_cmd)`取消注释，然后重新编译运行:
+#### 6.3.1 C++版本编译运行
 
-- 删除之前生成的构建文件夹***build***：
+打开一个新的终端，新建一个空的 ***build*** 文件夹（如果已经创建过 ***build*** 文件夹，可直接清空文件夹中所有内容）；
+```bash
+cd xxxxxxxx     # cd <path to where you want to create build directory>
+mkdir build
+```
 
-- 打开一个新的终端，新建一个空的 ***build*** 文件夹；
+打开 ***build*** 文件夹并编译：
+```bash
+cd build
+cmake .. -DBUILD_EXAMPLE=ON
+make -j
+```
 
-	```bash
-	git clone --recurse-submodules git@github.com:DeepRoboticsLab/X30_MotionSDK.git
-	cd xxxxxxxx     # cd <path to where you want to create build directory>
-	mkdir build
-	```
-	
-- 打开 ***build*** 文件夹并编译；
-	```bash
-	cd build
+编译结束后，会在 ***/build/example*** 目录下生成一个名为 ***motion_sdk_example*** 的可执行文件，运行该文件时，机器狗将会执行下发的控制指令：
+```bash
+./example/motion_sdk_example
+```
 
- 	cmake .. -DBUILD_EXAMPLE=ON
- 	make -j
- 	```
-- 编译结束后，会在 ***build/example*** 目录下生成一个名为 ***motion_sdk_example*** 的可执行文件，运行该文件时，机器狗将会执行下发的控制指令：
+#### 6.3.2 Python版本编译运行
 
-	```bash
-	./example/motion_sdk_example
-	```
-> **注意：用户在使用X30执行算法和实验的过程中，请与机器狗保持至少5米距离，并将机器狗悬挂在调试架上避免意外造成人员和设备损伤。若实验过程中，机器狗摔倒或者用户想搬动机器狗位置，需要靠近机器狗时，用户应当使得机器狗处于急停状态或者使用 `sudo ./stop.sh` 命令关闭运动程序。**
+Python版本程序采用pybind的形式生成。
 
+若已编译过C++版本的代码，可直接进入之前创建的 ***build*** 文件夹；若是首次编译，需新建一个 ***build*** 文件夹：
+```bash
+cd xxxxxxxx     # cd <path to where you want to create build directory>
+mkdir build
+```
+
+打开 ***build*** 文件夹并编译；
+```bash
+cd build
+cmake .. -DBUILD_PYTHON=ON
+make -j
+```
+
+正常情况下编译好的动态库文件会自动复制到 ***/python/lib*** 目录下，随后可以进入 ***/X30_MotionSDK/python*** 目录直接执行 ***motion_sdk_example.py*** 文件：
+```bash
+cd python/
+python motion_sdk_example.py
+```
 &nbsp;
-##  7 示例代码
 
-本节对 ***main.cpp*** 进行说明。  
+## 7 示例代码(C++)
+
+本节对 ***/example/main.cpp*** 进行说明。  
 
 定时器，用于设置算法周期，获得当前时间：
 
@@ -361,35 +369,7 @@ robot_set_up_demo.GetInitData(robot_data->motor_state,now_time);
 /// @param data_state Real-time status data of robot
 robot_set_up_demo.StandUp(robot_joint_cmd,now_time,*robot_data);
 ```
-
-
-
-## 8 python版本
-
-### 8.1 编译生成
-
-python版本程序采用pybind的形式生成，需要在6.3的步骤中增加编译选项（默认添加）,之后编译
-
-```
-cmake .. -DBUILD_PYTHON=ON
-make -j
-```
-
-正常情况下编译好的动态库文件会自动复制到 ***python/lib*** 目录下
-
-### 8.2 运行demo
-
-在 ***python***目录下 直接执行motion_sdk_example.py文件，效果与C++版本sdk一样
-
-```
-cd /python
-python motion_sdk_example.py
-```
-
-
-###### &nbsp;
-
+&nbsp;
 ### 其他注意事项
-
 1. X30运动主机是ARM架构的，如果开发者想在运动主机上编译自己的程序，需要注意。
 2. WiFi通讯受网络环境干扰产生的通讯延迟波动，可能对控制频率在500Hz以上的控制器有一定影响。
