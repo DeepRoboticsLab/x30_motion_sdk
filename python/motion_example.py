@@ -179,7 +179,6 @@ if __name__ == "__main__" :
             print("Robot is going to exit SDK control ")
             sender.control_get(1)
             break
-        if is_message_updated:
-            sender.set_send(robot_joint_cmd)
+        # sender.set_send(robot_joint_cmd)
         # print("cost_time: ", 1000.*(time.time() - start_time))
         
