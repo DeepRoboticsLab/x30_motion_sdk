@@ -241,10 +241,10 @@ MotionSDK采用UDP与机器狗进行通讯。
  	cmake .. -DBUILD_EXAMPLE=ON
  	make -j
  	```
-- 编译结束后，会在 ***build/example*** 目录下生成一个名为 ***motion_example*** 的可执行文件，运行该文件时，机器狗将会执行下发的控制指令：
+- 编译结束后，会在 ***build/example*** 目录下生成一个名为 ***motion_sdk_example*** 的可执行文件，运行该文件时，机器狗将会执行下发的控制指令：
 
 	```bash
-	./example/motion_example
+	./example/motion_sdk_example
 	```
 > **注意：用户在使用X30执行算法和实验的过程中，请与机器狗保持至少5米距离，并将机器狗悬挂在调试架上避免意外造成人员和设备损伤。若实验过程中，机器狗摔倒或者用户想搬动机器狗位置，需要靠近机器狗时，用户应当使得机器狗处于急停状态或者使用 `sudo ./stop.sh` 命令关闭运动程序。**
 
@@ -379,11 +379,11 @@ make -j
 
 ### 8.2 运行demo
 
-在 ***python***目录下 直接执行motion_example.py文件，效果与C++版本sdk一样
+在 ***python***目录下 直接执行motion_sdk_example.py文件，效果与C++版本sdk一样
 
 ```
 cd /python
-python motion_example.py
+python motion_sdk_example.py
 ```
 
 
