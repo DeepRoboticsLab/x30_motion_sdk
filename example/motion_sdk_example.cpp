@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2023
  * 
  */
-#include "motion_example.h"
+#include "motion_sdk_example.h"
 // Vec3 goal_angle_fl, goal_angle_hl, goal_angle_fr, goal_angle_hr;
 double init_angle_fl[3], init_angle_fr[3], init_angle_hl[3], init_angle_hr[3];
 double init_time;
@@ -28,7 +28,7 @@ double  kd_knee=4;
  * @param time Current timestamp
  * @param data_state Real-time status data of robot
  */
-void MotionExample::PreStandUp(RobotCmdSDK &cmd, double time,RobotDataSDK &data_state) {
+void MotionSDKExample::PreStandUp(RobotCmdSDK &cmd, double time,RobotDataSDK &data_state) {
   double standup_time = 1.0;
   double cycle_time = 0.001;
   double goal_angle_fl[] = {0*kDegree2Radian, -70*kDegree2Radian, 150*kDegree2Radian};
@@ -50,7 +50,7 @@ void MotionExample::PreStandUp(RobotCmdSDK &cmd, double time,RobotDataSDK &data_
  * @param time Current timestamp
  * @param data_state Real-time status data of robot
  */
-void MotionExample::StandUp(RobotCmdSDK &cmd, double time,RobotDataSDK &data_state) {
+void MotionSDKExample::StandUp(RobotCmdSDK &cmd, double time,RobotDataSDK &data_state) {
   double standup_time = 1.5;
   double cycle_time = 0.001;
   double goal_angle_fl[] = {0*kDegree2Radian, -42*kDegree2Radian, 78*kDegree2Radian};
@@ -84,7 +84,7 @@ void MotionExample::StandUp(RobotCmdSDK &cmd, double time,RobotDataSDK &data_sta
   * @param data Current joint data
   * @param time Current timestamp
   */
-void MotionExample::GetInitData(RobotDataSDK data, double time) {
+void MotionSDKExample::GetInitData(RobotDataSDK data, double time) {
   init_time = time;
   // Only the current moment and angle are recorded
   init_angle_fl[0] = data.fl_leg[0].pos;
@@ -115,7 +115,7 @@ void MotionExample::GetInitData(RobotDataSDK data, double time) {
  * @param cmd Issue control command
  * @param data Real-time status data of robot
  */
-void MotionExample::SwingToAngle(double initial_angle[3], double final_angle[3],
+void MotionSDKExample::SwingToAngle(double initial_angle[3], double final_angle[3],
                                  double total_time, double run_time,
                                  double cycle_time, string side,
                                  RobotCmdSDK &cmd,
@@ -204,7 +204,7 @@ void MotionExample::SwingToAngle(double initial_angle[3], double final_angle[3],
  * @param sub_goal_pos_next Target angle for the next control cycle
  * @param sub_goal_pos_next2 Target angle for the next and next control cycle
  */
-void MotionExample::CubicSpline(double init_pos, double init_vel,
+void MotionSDKExample::CubicSpline(double init_pos, double init_vel,
                                 double goal_pos, double goal_vel,
                                 double run_time, double cycle_time,
                                 double total_time, double &sub_goal_pos,

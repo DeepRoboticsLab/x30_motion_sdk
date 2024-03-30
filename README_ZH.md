@@ -229,6 +229,7 @@ MotionSDK采用UDP与机器狗进行通讯。
 - 打开一个新的终端，新建一个空的 ***build*** 文件夹；
 
 	```bash
+	git clone --recurse-submodules git@github.com:DeepRoboticsLab/X30_MotionSDK.git
 	cd xxxxxxxx     # cd <path to where you want to create build directory>
 	mkdir build
 	```
@@ -341,7 +342,7 @@ robot_joint_cmd.fl_leg[]->velocity;				  ///< Velocity of left front leg
 3.StandUp：机器狗起立。
 
 ```cpp
-MotionExample robot_set_up_demo;                      		  ///< Demo for testing
+MotionSDKExample robot_set_up_demo;                      		  ///< Demo for testing
 
 /// @brief Spend 1 sec drawing the robot's legs in and preparing to stand
 /// @param cmd Send control command
