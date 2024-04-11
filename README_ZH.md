@@ -88,7 +88,7 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 &nbsp;
 ## 4 SDK包下载
 
-使用git工具将 **X30_MotionSDK** 代码仓库克隆到本地:
+使用git工具将 **x30_motion_sdk** 代码仓库克隆到本地:
 ```bash
 cd xxxxxxxxxx    #cd <to where you want to store this project>
 git clone --recurse-submodules https://github.com/DeepRoboticsLab/x30_motion_sdk.git
@@ -250,7 +250,7 @@ cmake .. -DBUILD_PYTHON=ON
 make -j
 ```
 
-正常情况下编译好的动态库文件会自动复制到 ***/python/lib*** 目录下，随后可以进入 ***/X30_MotionSDK/python*** 目录直接执行 ***motion_sdk_example.py*** 文件：
+正常情况下编译好的动态库文件会自动复制到 ***/python/lib*** 目录下，随后可以进入 ***/x30_motion_sdk/python*** 目录直接执行 ***motion_sdk_example.py*** 文件：
 ```bash
 cd python/
 python motion_sdk_example.py

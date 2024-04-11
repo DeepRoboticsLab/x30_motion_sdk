@@ -84,7 +84,7 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 &nbsp;
 ## 4 SDK Download
 
-Clone **X30_MotionSDK** repository to local host:
+Clone **x30_motion_sdk** repository to local host:
 ```bash
 cd xxxxxxxxxx    #cd <to where you want to store this project>
 git clone --recurse-submodules https://github.com/DeepRoboticsLab/x30_motion_sdk.git
@@ -246,7 +246,7 @@ cmake .. -DBUILD_PYTHON=ON
 make -j
 ```
 
-Normally, the compiled dynamic library files will be automatically copied to the ***/python/lib*** directory. Then you can navigate to the ***/X30_MotionSDK/python*** directory and directly execute ***motion_sdk_example.py***:
+Normally, the compiled dynamic library files will be automatically copied to the ***/python/lib*** directory. Then you can navigate to the ***/x30_motion_sdk/python*** directory and directly execute ***motion_sdk_example.py***:
 ```bash
 cd /python
 python motion_sdk_example.py
