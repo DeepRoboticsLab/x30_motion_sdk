@@ -87,7 +87,7 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 Clone **X30_MotionSDK** repository to local host:
 ```bash
 cd xxxxxxxxxx    #cd <to where you want to store this project>
-git clone --recurse-submodules git@github.com:DeepRoboticsLab/X30_MotionSDK.git
+git clone --recurse-submodules https://github.com/DeepRoboticsLab/x30_motion_sdk.git
 ```
 
 &nbsp; 

@@ -91,7 +91,7 @@ $$pos_{goal}=3.14, vel_{goal}=0, kp=30, kd=1, t_{ff} = 1$$
 使用git工具将 **X30_MotionSDK** 代码仓库克隆到本地:
 ```bash
 cd xxxxxxxxxx    #cd <to where you want to store this project>
-git clone --recurse-submodules git@github.com:DeepRoboticsLab/X30_MotionSDK.git
+git clone --recurse-submodules https://github.com/DeepRoboticsLab/x30_motion_sdk.git
 ```
 &nbsp; 
 ## 5 配置SDK参数和数据上报地址
