@@ -13,6 +13,7 @@
 #include "send_to_robot.h"
 
 using namespace std;
+using namespace x30;
 
 SendToRobot::SendToRobot(std::string ip, uint16_t port){
   udp_socket_ = new UDPSocket(true);

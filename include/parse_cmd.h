@@ -24,12 +24,13 @@
 #include <sys/timerfd.h>
 #include <sys/epoll.h>
 
-#include "robot_types.h"
+#include "x30_types.h"
 #include "udp_server.hpp"
 #define LOCAL_PORT 43897 /**< 43897 Local Port Number.*/
-
 #define STATE_RECEIVE_CODE 0x0906 /**< Command code for receiving robot data.*/
 
+
+namespace x30{
 /**
  * @brief A class used to receive robot data.
  */
@@ -73,5 +74,5 @@ class ParseCommand{
       return is_data_recv;
     }
 };
-
+};
 #endif  // PARSE_CMD_H_

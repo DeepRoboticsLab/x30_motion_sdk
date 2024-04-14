@@ -1,7 +1,8 @@
 # -*- coding: UTF-8 -*-
 import sys
-sys.path.append('./lib')
-import deeprobotics_motion_sdk_py as dr
+sys.path.append('./lib/')
+# print(sys.path)
+import deeprobotics_x30_motion_sdk_py as dr
 import numpy as np
 import time
 

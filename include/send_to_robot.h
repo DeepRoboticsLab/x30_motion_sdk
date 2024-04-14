@@ -25,7 +25,7 @@
 #include <sys/epoll.h>
 #include "command_list.h"
 #include "udp_socket.hpp"
-#include "robot_types.h"
+#include "x30_types.h"
 
 #define DEFAULT_ROBOT_IP "192.168.1.103"
 #define DEFAULT_ROBOT_PORT 43893
@@ -33,6 +33,7 @@
 #define ABLE 2
 #define UNABLE 1
 
+namespace x30{
 /**
  * @brief A class used to send robot data.
  */
@@ -151,5 +152,5 @@ class TimeTool{
     double get_start_time(); /**< Get start time.*/
 };
 
-
+};//namespace x30
 #endif  // PARSE_CMD_H_

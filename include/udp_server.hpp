@@ -3,6 +3,7 @@
 #include "udp_socket.hpp"
 #include <thread>
 
+namespace x30{
 class UDPServer : public UDPSocket
 {
 public:
@@ -38,4 +39,6 @@ public:
             return;
         }
     }
+};
+
 };

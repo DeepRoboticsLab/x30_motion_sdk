@@ -4,6 +4,7 @@
 #include <string.h>
 #include <thread>
 
+namespace x30{
 class UDPSocket : public BaseSocket
 {
 public:
@@ -181,4 +182,6 @@ private:
             }
         }
     }
+};
+
 };

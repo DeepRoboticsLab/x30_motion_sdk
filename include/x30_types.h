@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include <array>
 
-
+namespace x30{
 struct ImuDataSDK{
   int32_t timestamp;
   union{
@@ -96,7 +96,7 @@ typedef struct{
 }RobotDataSDK;
 
 
-
+};
 
 
 

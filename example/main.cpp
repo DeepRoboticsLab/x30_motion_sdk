@@ -19,8 +19,6 @@
 #include <time.h>
 #include <string.h>
 
-#include "robot_types.h"
-
 using namespace std;
   bool is_message_updated_ = false; ///< Flag to check if message has been updated
   /**

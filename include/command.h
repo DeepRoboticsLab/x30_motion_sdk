@@ -18,7 +18,7 @@
 #include <array>
 #include <bitset>
 
-
+namespace x30{
 struct EthCommand{
   uint32_t code;
   union{
@@ -73,5 +73,5 @@ class Command {
     friend std::ostream& operator<<(std::ostream& stream, Command& c);
 }; // end of Command
 
-
+};//namespace x30
 #endif  // COMMAND_H_

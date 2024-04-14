@@ -11,7 +11,7 @@
 
 #include "parse_cmd.h"
 #include "send_to_robot.h"
-#include "robot_types.h"
+#include "x30_types.h"
 #include <functional>
 #include <pybind11/pybind11.h>
 #include <pybind11/functional.h>
@@ -22,9 +22,11 @@
 #include <pybind11/numpy.h>
 #include <array>
 
+using namespace x30;
 namespace py = pybind11;
 
-PYBIND11_MODULE(deeprobotics_motion_sdk_py, m) {
+
+PYBIND11_MODULE(deeprobotics_x30_motion_sdk_py, m) {
   py::class_<ImuDataSDK>(m, "ImuDataSDK")
     .def(py::init<>())
     .def_readwrite("timestamp", &ImuDataSDK::timestamp)

@@ -7,7 +7,6 @@ set(SOURCES
     main.cpp
 )
 
-
 add_executable(motion_sdk_example ${SOURCES})
-target_link_libraries(motion_sdk_example deeprobotics_motion_sdk_${CMAKE_SYSTEM_PROCESSOR})
+target_link_libraries(motion_sdk_example deeprobotics_${ROBOT_NAME}_motion_sdk_${CMAKE_SYSTEM_PROCESSOR})
 

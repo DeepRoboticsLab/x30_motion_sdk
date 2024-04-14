@@ -11,7 +11,7 @@
 
 #include "command.h"
 
-
+using namespace x30;
 Command::Command() {
   command_code_ = 0;
   command_value_ = 0;

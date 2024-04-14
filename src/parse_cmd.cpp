@@ -12,6 +12,7 @@
 #include "parse_cmd.h"
 #include "command_list.h"
 using namespace std;
+using namespace x30;
 
 ParseCommand::ParseCommand(int port):local_port(port){
   memset(&state_rec, 0, sizeof(state_rec));

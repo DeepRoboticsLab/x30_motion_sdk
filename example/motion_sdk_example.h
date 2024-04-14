@@ -1,14 +1,11 @@
 #include "command_list.h"
 #include "parse_cmd.h"
-#include "robot_types.h"
-// #include <iostream>
 #include <time.h>
 #include <string.h>
-// #include "Eigen/Dense"
-using namespace std;
-// using namespace Eigen;
 
-// typedef Matrix< double, 3, 1> Vec3;
+using namespace std;
+using namespace x30;
+
 
 const double kDegree2Radian = 3.1415926 / 180;
 

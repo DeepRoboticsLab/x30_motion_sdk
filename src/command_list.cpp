@@ -11,7 +11,7 @@
 
 
 #include "command_list.h"
-
+using namespace x30;
 
 CommandList::CommandList() {
   pthread_mutex_init(&mutex_,NULL);

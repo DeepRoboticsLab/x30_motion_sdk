@@ -14,6 +14,8 @@
 
 #include <deque>
 #include "command.h"
+
+namespace x30{
 class CommandList {
   private:
     std::deque<Command*> command_list_;
@@ -28,5 +30,5 @@ class CommandList {
     uint32_t get_command_front(Command& command);
     uint32_t get_command_back(Command& command);
 };
-
+};//namespace x30
 #endif  // COMMAND_H_
