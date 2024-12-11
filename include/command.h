@@ -9,8 +9,8 @@
  * 
  */
 
-#ifndef COMMAND_H_
-#define COMMAND_H_
+#ifndef X30_COMMAND_H_
+#define X30_COMMAND_H_
 
 #include <iostream>
 #include <cmath>

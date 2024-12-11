@@ -9,8 +9,8 @@
  * 
  */
 
-#ifndef COMMAND_LIST_H_
-#define COMMAND_LIST_H_
+#ifndef X30_COMMAND_LIST_H_
+#define X30_COMMAND_LIST_H_
 
 #include <deque>
 #include "command.h"

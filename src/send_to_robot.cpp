@@ -93,13 +93,9 @@ void SendToRobot::set_send(RobotCmdSDK& cmd){
 //   cmd_done(command_temp);
 // }
 
-void SendToRobot::all_joint_back_zero(){
-   Command command_temp(0x31010C05,0, 0);
-  cmd_done(command_temp);
-}
 void SendToRobot::robot_state_init(){
-  Command command_temp(0x31010C05,0, 0);
-  cmd_done(command_temp);
+  // Command command_temp(0x31010C05,0, 0);
+  // cmd_done(command_temp);
   usleep(1000*1000*7);
   Command command_temp_1(0x0114,0,0);
 

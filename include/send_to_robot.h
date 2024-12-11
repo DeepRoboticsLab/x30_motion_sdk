@@ -10,8 +10,8 @@
  */
 
 
-#ifndef SEND_TO_ROBOT_H_
-#define SEND_TO_ROBOT_H_
+#ifndef X30_SEND_TO_ROBOT_H_
+#define X30_SEND_TO_ROBOT_H_
 
 #include <iostream>
 #include <cmath>
@@ -72,11 +72,6 @@ class SendToRobot{
     * @param RobotCmdSDK
     */ 
     void set_send(RobotCmdSDK&);
-
-    /**
-    * @brief Initialization timer for receiving data
-    */ 
-    void all_joint_back_zero(void); /**< Set all joint motors of the robot to zero.*/
 
     /**
     * @brief Initialize the robot for the first time after powering on

@@ -10,8 +10,8 @@
  */
 
 
-#ifndef PARSE_CMD_H_
-#define PARSE_CMD_H_
+#ifndef X30_PARSE_CMD_H_
+#define X30_PARSE_CMD_H_
 
 #include <iostream>
 #include <cmath>

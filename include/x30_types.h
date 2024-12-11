@@ -10,8 +10,8 @@
  */
 
 
-#ifndef ROBOT_TYPES_H_
-#define ROBOT_TYPES_H_
+#ifndef X30_ROBOT_TYPES_H_
+#define X30_ROBOT_TYPES_H_
 
 #include <iostream>
 #include <cmath>
