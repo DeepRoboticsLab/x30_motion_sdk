@@ -86,6 +86,5 @@ PYBIND11_MODULE(deeprobotics_x30_motion_sdk_py, m) {
     .def(py::init<std::string , uint16_t>())
     .def("set_send", &SendToRobot::set_send)
     .def("control_get", &SendToRobot::control_get)
-    .def("all_joint_back_zero", &SendToRobot::all_joint_back_zero)
     .def("robot_state_init", &SendToRobot::robot_state_init);
 }
